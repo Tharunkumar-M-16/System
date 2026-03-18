@@ -3,5 +3,5 @@ flask-cors
 pymongo[srv]
 bcrypt
 python-dotenv
-Flask-Login
+flask-login
 gunicorn
