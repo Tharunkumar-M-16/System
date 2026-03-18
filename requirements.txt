@@ -1,0 +1,6 @@
+flask>=3.0
+pymongo[srv]
+bcrypt
+python-dotenv
+Flask-Login
+gunicorn

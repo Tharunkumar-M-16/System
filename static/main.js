@@ -1,0 +1,375 @@
+const API_BASE = "";
+
+let state = {
+    profile: null,
+    checked: [],
+    claiming: false,
+    rewardData: null,
+    authMode: 'login',
+    loggedIn: false
+};
+
+async function init() {
+    await checkAuth();
+}
+
+async function checkAuth() {
+    try {
+        const res = await fetch(`${API_BASE}/api/check-auth`);
+        const data = await res.json();
+        if (data.logged_in) {
+            state.loggedIn = true;
+            await fetchProfile();
+        } else {
+            state.loggedIn = false;
+        }
+    } catch (err) {
+        console.error("Auth check failed:", err);
+    }
+    render();
+}
+
+async function fetchProfile() {
+    try {
+        const res = await fetch(`${API_BASE}/api/status`);
+        if (res.status === 401) {
+            state.loggedIn = false;
+            return;
+        }
+        state.profile = await res.json();
+        state.checked = [];
+        state.rewardData = null;
+    } catch (err) {
+        console.error("Failed to fetch profile:", err);
+    }
+}
+
+async function handleAuth(e) {
+    e.preventDefault();
+    const username = e.target.username.value;
+    const password = e.target.password.value;
+    const endpoint = state.authMode === 'login' ? '/api/login' : '/api/register';
+
+    try {
+        const res = await fetch(`${API_BASE}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            if (state.authMode === 'register') {
+                alert("Hunter profile created! Please login.");
+                state.authMode = 'login';
+                render();
+            } else {
+                state.loggedIn = true;
+                await fetchProfile();
+                render();
+            }
+        } else {
+            alert(data.error || "Authentication failed");
+        }
+    } catch (err) {
+        alert("Server error");
+    }
+}
+
+async function logout() {
+    await fetch(`${API_BASE}/api/logout`, { method: 'POST' });
+    state.loggedIn = false;
+    state.profile = null;
+    state.rewardData = null;
+    state.checked = [];
+    render();
+}
+
+function switchAuthMode() {
+    state.authMode = state.authMode === 'login' ? 'register' : 'login';
+    render();
+}
+
+function toggleQuest(id) {
+    if (state.rewardData) return;
+    if (state.checked.includes(id)) {
+        state.checked = state.checked.filter(x => x !== id);
+    } else {
+        state.checked.push(id);
+    }
+    render();
+}
+
+async function claimRewards() {
+    const quests = state.profile.current_phase.quests;
+    if (state.checked.length !== quests.length || state.claiming || state.rewardData) return;
+
+    state.claiming = true;
+    render();
+
+    try {
+        const res = await fetch(`${API_BASE}/api/complete-daily`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pushups_done: 25, run_done: true }),
+        });
+        const data = await res.json();
+        if (data.success) {
+            state.rewardData = data;
+            await fetchProfile();
+            // Keep rewardData visible after profile refresh
+            state.rewardData = data;
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        console.error("Failed to claim rewards:", err);
+    } finally {
+        state.claiming = false;
+        render();
+    }
+}
+
+function render() {
+    const authRoot = document.getElementById('auth-root');
+    const hunterContainer = document.getElementById('hunter-container');
+
+    if (!state.loggedIn) {
+        authRoot.style.display = 'block';
+        hunterContainer.style.display = 'none';
+        renderAuth(authRoot);
+    } else {
+        authRoot.style.display = 'none';
+        hunterContainer.style.display = 'flex';
+        renderDashboard(hunterContainer);
+    }
+}
+
+function renderAuth(container) {
+    container.innerHTML = `
+        <section class="sl-card auth-card">
+            <div class="sl-auth-logo">⚔️</div>
+            <h2 class="sl-section-title" style="justify-content: center; margin-bottom: 5px;">
+                ${state.authMode === 'login' ? 'IDENTITY VERIFICATION' : 'HUNTER REGISTRATION'}
+            </h2>
+            <p class="sl-auth-subtitle">${state.authMode === 'login' ? 'Authenticate to access your System' : 'Initialize a new 100-Day Hunter Profile'}</p>
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                <div class="sl-form-group">
+                    <label class="sl-label">HUNTER NAME</label>
+                    <input type="text" name="username" class="sl-input" required placeholder="Enter your name">
+                </div>
+                <div class="sl-form-group">
+                    <label class="sl-label">PASSCODE</label>
+                    <input type="password" name="password" class="sl-input" required placeholder="Enter your secret">
+                </div>
+                <button type="submit" class="sl-claim-btn sl-claim-active" style="margin-top: 20px;">
+                    ${state.authMode === 'login' ? '✦ AUTHENTICATE ✦' : '✦ INITIALIZE PROFILE ✦'}
+                </button>
+            </form>
+            <p class="sl-auth-toggle">
+                ${state.authMode === 'login' ? "No profile yet?" : "Already a hunter?"}
+                <span onclick="switchAuthMode()">${state.authMode === 'login' ? 'REGISTER HERE' : 'LOGIN HERE'}</span>
+            </p>
+        </section>
+    `;
+}
+
+function renderDashboard(container) {
+    if (!state.profile) return;
+
+    const p = state.profile;
+    const phase = p.current_phase;
+    const quests = phase.quests;
+    const day = p.current_day;
+    const xpPct = Math.min(100, (p.xp / p.xp_to_next) * 100);
+    const allDone = state.checked.length === quests.length;
+    const progressPct = Math.min(100, Math.round((p.daily_completed_streak / 100) * 100));
+
+    const uiStats = [
+        { key: "STR", label: "STRENGTH", value: p.stats.STR, icon: "⚔️" },
+        { key: "INT", label: "INTELLIGENCE", value: p.stats.INT, icon: "🧠" },
+        { key: "AGI", label: "AGILITY", value: p.stats.AGI, icon: "💨" },
+        { key: "VIT", label: "VITALITY", value: p.stats.VIT, icon: "❤️" },
+        { key: "WIL", label: "WILLPOWER", value: p.stats.WIL, icon: "🔥" },
+    ];
+
+    container.innerHTML = `
+        <!-- ── Profile Card ── -->
+        <section class="sl-card sl-profile-card">
+          <div class="sl-logout-btn" onclick="logout()">LOGOUT</div>
+          <div class="sl-profile-header">
+            <div class="sl-avatar">
+              <div class="sl-avatar-inner">
+                <svg viewBox="0 0 60 60" fill="none" class="sl-avatar-svg">
+                  <circle cx="30" cy="20" r="12" stroke="currentColor" stroke-width="1.5" />
+                  <path d="M10 58 C10 40 50 40 50 58" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+              </div>
+              <div class="sl-avatar-ring"></div>
+            </div>
+            <div class="sl-profile-info">
+              <p class="sl-subtitle">PLAYER STATUS · DAY ${p.daily_completed_streak} / 100</p>
+              <h1 class="sl-name">HUNTER <span class="sl-name-accent">${p.hunter_name.toUpperCase()}</span></h1>
+              <div class="sl-badges">
+                <span class="sl-badge sl-badge-rank">${phase.rank.toUpperCase()}</span>
+                <span class="sl-badge sl-badge-level">LVL ${p.level}</span>
+                <span class="sl-badge sl-badge-phase">PHASE ${phase.phase_id}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-title-row">
+            <span class="sl-title-label">PHASE</span>
+            <span class="sl-title-value">${phase.title.toUpperCase()}</span>
+          </div>
+
+          <div class="sl-xp-section">
+            <div class="sl-xp-header">
+              <span class="sl-xp-label">EXPERIENCE POINTS</span>
+              <span class="sl-xp-value">${p.xp} / ${p.xp_to_next} XP</span>
+            </div>
+            <div class="sl-xp-track">
+              <div class="sl-xp-fill" style="width: ${xpPct}%"></div>
+              <div class="sl-xp-glow" style="width: ${xpPct}%"></div>
+            </div>
+          </div>
+
+          <!-- 100-Day Progress Bar -->
+          <div class="sl-xp-section" style="margin-top: 12px;">
+            <div class="sl-xp-header">
+              <span class="sl-xp-label">100-DAY PROGRESS</span>
+              <span class="sl-xp-value">${p.daily_completed_streak} / 100 DAYS</span>
+            </div>
+            <div class="sl-xp-track">
+              <div class="sl-xp-fill" style="width: ${progressPct}%; background: linear-gradient(90deg, #06b6d4, #8b5cf6);"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Phase Info Card ── -->
+        <section class="sl-card sl-phase-card">
+          <h2 class="sl-section-title">
+            <span class="sl-section-line"></span>
+            ${phase.rank.toUpperCase()} · ${phase.days.toUpperCase()}
+            <span class="sl-section-line"></span>
+          </h2>
+          <p class="sl-phase-focus">
+            <span class="sl-phase-focus-label">FOCUS:</span> ${phase.focus}
+          </p>
+          <div class="sl-levelup-req">
+            <span class="sl-levelup-label">⚡ LEVEL-UP REQUIREMENT (Day ${phase.levelup_day})</span>
+            <span class="sl-levelup-text">${phase.levelup_req}</span>
+          </div>
+        </section>
+
+        <!-- ── Stats Card ── -->
+        <section class="sl-card sl-stats-card">
+          <h2 class="sl-section-title">
+            <span class="sl-section-line"></span>
+            BASE STATS
+            <span class="sl-section-line"></span>
+          </h2>
+          <div class="sl-stats-grid">
+            ${uiStats.map(s => `
+              <div class="sl-stat-item">
+                <span class="sl-stat-icon">${s.icon}</span>
+                <div class="sl-stat-body">
+                  <span class="sl-stat-key">${s.key}</span>
+                  <span class="sl-stat-label">${s.label}</span>
+                </div>
+                <span class="sl-stat-value">${s.value} / 100</span>
+                <div class="sl-stat-bar-track">
+                  <div class="sl-stat-bar-fill" style="width: ${s.value}%"></div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+
+        <!-- ── Daily Quest Card ── -->
+        <section class="sl-card sl-quest-card">
+          <h2 class="sl-section-title">
+            <span class="sl-section-line"></span>
+            DAILY QUEST · DAY ${day}
+            <span class="sl-section-line"></span>
+          </h2>
+          <p class="sl-quest-subtitle">THE ${phase.rank.toUpperCase()} ${phase.title.toUpperCase()}</p>
+
+          <ul class="sl-quest-list">
+            ${quests.map(q => {
+                const done = state.checked.includes(q.id);
+                return `
+                    <li class="sl-quest-item ${done ? 'sl-quest-done' : ''}" onclick="toggleQuest(${q.id})">
+                      <div class="sl-checkbox ${done ? 'sl-checkbox-checked' : ''}">
+                        ${done ? `
+                          <svg viewBox="0 0 12 12" fill="none" class="sl-check-svg">
+                            <polyline points="2,6 5,9 10,3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                          </svg>
+                        ` : ''}
+                      </div>
+                      <div class="sl-quest-text">
+                        <span class="sl-quest-label">${q.label}</span>
+                        <span class="sl-quest-sub">${q.sub}</span>
+                      </div>
+                      ${done ? '<span class="sl-quest-complete-badge">✓ DONE</span>' : ''}
+                    </li>
+                `;
+            }).join('')}
+          </ul>
+
+          <div class="sl-quest-progress">
+            <span class="sl-qp-label">PROGRESS</span>
+            <span class="sl-qp-value">${state.checked.length} / ${quests.length}</span>
+          </div>
+
+          <button
+            id="claim-btn"
+            class="sl-claim-btn ${allDone ? 'sl-claim-active' : 'sl-claim-inactive'} ${state.rewardData ? 'sl-claim-claimed' : ''}"
+            onclick="claimRewards()"
+            ${(!allDone || state.claiming || state.rewardData) ? 'disabled' : ''}
+          >
+            ${state.rewardData ? '✦ REWARDS CLAIMED ✦' : state.claiming ? 'PROCESSING...' : allDone ? '✦ CLAIM REWARDS ✦' : 'COMPLETE ALL QUESTS'}
+          </button>
+
+          ${state.rewardData ? `
+            <div class="sl-reward-popup">
+              <p class="sl-reward-title">QUEST COMPLETE — DAY ${state.rewardData.streak}</p>
+              <p class="sl-reward-text">+${state.rewardData.xp_earned} XP · ${state.rewardData.streak_bonus ? state.rewardData.streak_bonus : 'Daily Reward'}</p>
+              ${state.rewardData.level_up ? `<p class="sl-reward-alt">${state.rewardData.level_up}</p>` : ''}
+              ${state.rewardData.phase_milestone ? `<p class="sl-reward-alt" style="color: #a78bfa;">${state.rewardData.phase_milestone}</p>` : ''}
+              ${state.rewardData.phase_unlock ? `<p class="sl-reward-alt" style="color: #38bdf8;">${state.rewardData.phase_unlock}</p>` : ''}
+              ${state.rewardData.final_boss ? `<p class="sl-reward-alt" style="color: #fcd34d; font-size:12px;">${state.rewardData.final_boss}</p>` : ''}
+            </div>
+          ` : ''}
+        </section>
+
+        <!-- ── Milestone Card ── -->
+        ${day <= 100 ? `
+        <section class="sl-card sl-rankup-card">
+          <div class="sl-rankup-top">
+            <span class="sl-rankup-tag">NEXT GATE</span>
+            <span class="sl-rankup-glow-tag">DAY ${phase.levelup_day} · ${phase.next_rank.toUpperCase()}</span>
+          </div>
+          <h3 class="sl-rankup-title">${phase.levelup_req.toUpperCase()}</h3>
+          <p class="sl-rankup-desc">
+            Complete Day ${phase.levelup_day} to advance from <span class="sl-hl">${phase.current_rank}</span> to <span class="sl-hl">${phase.next_rank}</span>.
+          </p>
+          <div class="sl-rankup-reward">
+            <span class="sl-rankup-reward-label">REWARDS</span>
+            <div class="sl-rankup-reward-items">
+              <span class="sl-reward-item">+50 BONUS XP</span>
+              <span class="sl-reward-item">${phase.next_rank.toUpperCase()} RANK</span>
+            </div>
+          </div>
+        </section>
+        ` : ''}
+    `;
+}
+
+// Global exposure
+window.toggleQuest = toggleQuest;
+window.claimRewards = claimRewards;
+window.handleAuth = handleAuth;
+window.switchAuthMode = switchAuthMode;
+window.logout = logout;
+
+init();
