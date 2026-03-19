@@ -5,8 +5,7 @@ let state = {
     checked: [],
     claiming: false,
     rewardData: null,
-    ytPlayer: null,
-    ytReady: false,
+    bgmPlayer: null,
     authMode: 'login',
     loggedIn: false
 };
@@ -19,58 +18,26 @@ const SFX_URLS = {
     'click': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' // Subtle click
 };
 
-// YouTube Video IDs for Dark Aria (Primary and Fallback)
-const BGM_VIDEO_ID = 'uK7Yw0CqK9w'; 
-const FALLBACK_BGM_ID = 'm02d6iOAtY8';
+// Local BGM: Place your "dark_aria.mp3" in the static folder
+const BGM_URL = '/static/dark_aria.mp3'; 
 
-function onYouTubeIframeAPIReady() {
-    console.log("YouTube API Ready");
-    state.ytPlayer = new YT.Player('yt-player', {
-        height: '0',
-        width: '0',
-        videoId: BGM_VIDEO_ID,
-        playerVars: {
-            'autoplay': 0,
-            'loop': 1,
-            'playlist': BGM_VIDEO_ID,
-            'controls': 0,
-            'showinfo': 0,
-            'rel': 0
-        },
-        events: {
-            'onReady': () => { 
-                console.log("YouTube Player Ready for video: ", BGM_VIDEO_ID);
-                state.ytReady = true; 
-            },
-            'onStateChange': (event) => {
-                if (event.data === YT.PlayerState.PAUSED && state.ytReady) {
-                    // Try to resume if it was paused by browser policy
-                    state.ytPlayer.playVideo();
-                }
-            },
-            'onError': (e) => {
-                console.error("YouTube Player Error: ", e.data, " - Attempting fallback...");
-                if (state.ytPlayer && e.data !== 2) {
-                    state.ytPlayer.loadVideoById(FALLBACK_BGM_ID);
-                }
-            }
-        }
-    });
+function initBGM() {
+    if (!state.bgmPlayer) {
+        state.bgmPlayer = new Audio(BGM_URL);
+        state.bgmPlayer.loop = true;
+        state.bgmPlayer.volume = 0.2;
+    }
 }
 
 // Global click listener to unlock audio (browser requirement)
 document.addEventListener('click', () => {
-    console.log("First click detected. Attempting to start BGM...");
-    if (state.ytReady && state.ytPlayer) {
-        state.ytPlayer.setVolume(50);
-        state.ytPlayer.playVideo();
-    } else {
-        console.warn("YouTube Player not ready yet. Ready status:", state.ytReady);
+    initBGM();
+    if (state.bgmPlayer) {
+        state.bgmPlayer.play().catch(e => {
+            console.error("BGM Play Error: Make sure /static/dark_aria.mp3 exists.", e);
+        });
     }
 }, { once: true });
-
-// Expose to window for YT API
-window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 
 
 async function init() {

@@ -1,51 +1,24 @@
 const API_BASE = "";
 
-let ytPlayer = null;
-let ytReady = false;
-const BGM_VIDEO_ID = 'uK7Yw0CqK9w'; 
-const FALLBACK_BGM_ID = 'm02d6iOAtY8';
+let bgmPlayer = null;
+const BGM_URL = '/static/dark_aria.mp3'; 
 
-function onYouTubeIframeAPIReady() {
-    console.log("Leaderboard: YouTube API Ready");
-    ytPlayer = new YT.Player('yt-player', {
-        height: '0',
-        width: '0',
-        videoId: BGM_VIDEO_ID,
-        playerVars: {
-            'autoplay': 0,
-            'loop': 1,
-            'playlist': BGM_VIDEO_ID,
-            'controls': 0,
-            'showinfo': 0,
-            'rel': 0
-        },
-        events: {
-            'onReady': () => { 
-                console.log("Leaderboard: YouTube Player Ready");
-                ytReady = true; 
-            },
-            'onStateChange': (e) => { 
-                if (e.data === YT.PlayerState.PAUSED && ytReady) {
-                    ytPlayer.playVideo();
-                }
-            },
-            'onError': (e) => { 
-                console.error("LB YT Error:", e.data, " - Attempting fallback...");
-                if (ytPlayer) ytPlayer.loadVideoById(FALLBACK_BGM_ID);
-            }
-        }
-    });
+function initBGM() {
+    if (!bgmPlayer) {
+        bgmPlayer = new Audio(BGM_URL);
+        bgmPlayer.loop = true;
+        bgmPlayer.volume = 0.2;
+    }
 }
 
 document.addEventListener('click', () => {
-    console.log("Leaderboard: Click detected, playing BGM...");
-    if (ytReady && ytPlayer) {
-        ytPlayer.setVolume(50);
-        ytPlayer.playVideo();
+    initBGM();
+    if (bgmPlayer) {
+        bgmPlayer.play().catch(e => {
+            console.error("Leaderboard BGM Error: Ensure /static/dark_aria.mp3 exists.", e);
+        });
     }
 }, { once: true });
-
-window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 
 async function initLeaderboard() {
     try {
