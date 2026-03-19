@@ -18,8 +18,8 @@ const SFX_URLS = {
     'click': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' // Subtle click
 };
 
-// Local BGM: Place your "dark_aria.mp3" in the static folder
-const BGM_URL = '/static/dark_aria.mp3'; 
+// Local BGM: Place your "dark_aira.mp3" in the static folder
+const BGM_URL = '/static/dark_aira.mp3'; 
 
 function initBGM() {
     if (!state.bgmPlayer) {

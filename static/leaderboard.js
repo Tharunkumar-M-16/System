@@ -1,7 +1,7 @@
 const API_BASE = "";
 
 let bgmPlayer = null;
-const BGM_URL = '/static/dark_aria.mp3'; 
+const BGM_URL = '/static/dark_aira.mp3'; 
 
 function initBGM() {
     if (!bgmPlayer) {
