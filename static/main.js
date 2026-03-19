@@ -5,9 +5,23 @@ let state = {
     checked: [],
     claiming: false,
     rewardData: null,
+    bgmEnabled: false,
+    bgmPlayer: null,
     authMode: 'login',
     loggedIn: false
 };
+
+const SFX_URLS = {
+    'stat_up': 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', // Digital blip
+    'level_up': 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3', // Level up fanfare
+    'quest_complete': 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3', // Success
+    'error': 'https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3', // Error buzz
+    'click': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' // Subtle click
+};
+
+// Use a darker, synth-wave theme for BGM
+const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'; 
+
 
 async function init() {
     await checkAuth();
@@ -91,6 +105,7 @@ function switchAuthMode() {
 
 function toggleQuest(id) {
     if (state.rewardData) return;
+    playSFX('click');
     if (state.checked.includes(id)) {
         state.checked = state.checked.filter(x => x !== id);
     } else {
@@ -115,7 +130,15 @@ async function claimRewards() {
         const data = await res.json();
         if (data.success) {
             state.rewardData = data;
+            const oldLevel = state.profile.level;
             await fetchProfile();
+            
+            if (state.profile.level > oldLevel) {
+                playSFX('level_up');
+            } else {
+                playSFX('quest_complete');
+            }
+
             // Keep rewardData visible after profile refresh
             state.rewardData = data;
         } else {
@@ -149,14 +172,27 @@ async function assignStat(stat) {
 }
 
 function playSFX(type) {
-    // Simple console-based feedback for now, can be replaced with actual Audio() calls
-    const colors = {
-        'stat_up': '#06b6d4',
-        'level_up': '#facc15',
-        'quest_complete': '#10b981',
-        'error': '#ef4444'
-    };
-    console.log(`%c[SYSTEM] ${type.toUpperCase()} EFFECT TRIGGERED`, `color: ${colors[type] || 'white'}; font-weight: bold;`);
+    if (!SFX_URLS[type]) return;
+    const audio = new Audio(SFX_URLS[type]);
+    audio.volume = 0.4;
+    audio.play().catch(e => console.log("Audio play blocked: ", e));
+}
+
+function toggleBGM() {
+    if (!state.bgmPlayer) {
+        state.bgmPlayer = new Audio(BGM_URL);
+        state.bgmPlayer.loop = true;
+        state.bgmPlayer.volume = 0.2;
+    }
+
+    if (state.bgmEnabled) {
+        state.bgmPlayer.pause();
+        state.bgmEnabled = false;
+    } else {
+        state.bgmPlayer.play().catch(e => console.log("BGM play blocked: ", e));
+        state.bgmEnabled = true;
+    }
+    render();
 }
 
 function render() {
@@ -236,7 +272,12 @@ function renderDashboard(container) {
         <!-- ── Profile Card ── -->
         <section class="sl-card sl-profile-card">
           <div class="sl-top-nav">
-            <div class="sl-logout-btn" onclick="logout()">LOGOUT</div>
+            <div class="sl-nav-row">
+                <div class="sl-music-toggle ${state.bgmEnabled ? 'sl-music-on' : ''}" onclick="toggleBGM()">
+                    ${state.bgmEnabled ? '🔊 MUSIC ON' : '🔈 MUSIC OFF'}
+                </div>
+                <div class="sl-logout-btn" onclick="logout()">LOGOUT</div>
+            </div>
             <div class="sl-nav-btn" onclick="window.location.href='/leaderboard'">⚔ LEADERBOARD</div>
           </div>
           <div class="sl-profile-header">
@@ -447,5 +488,6 @@ window.handleAuth = handleAuth;
 window.switchAuthMode = switchAuthMode;
 window.logout = logout;
 window.assignStat = assignStat;
+window.toggleBGM = toggleBGM;
 
 init();
