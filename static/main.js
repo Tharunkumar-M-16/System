@@ -243,6 +243,7 @@ function renderDashboard(container) {
 
     const p = state.profile;
     const phase = p.current_phase;
+    if (!phase || !phase.quests) return;
     const quests = phase.quests;
     const day = p.current_day;
     const xpPct = Math.min(100, (p.xp / p.xp_to_next) * 100);
@@ -484,6 +485,5 @@ window.handleAuth = handleAuth;
 window.switchAuthMode = switchAuthMode;
 window.logout = logout;
 window.assignStat = assignStat;
-window.toggleBGM = toggleBGM;
 
 init();
