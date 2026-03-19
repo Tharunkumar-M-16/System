@@ -264,6 +264,10 @@ def check_auth():
 # Game Endpoints
 # ---------------------------------------------------------------------------
 
+@app.route("/api/health")
+def health_check():
+    return jsonify({"status": "active"}), 200
+
 @app.route("/")
 def index():
     return render_template("index.html")
