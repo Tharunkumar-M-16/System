@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Solo Leveling | Leaderboard</title>
+    <link rel="stylesheet" href="/static/solo-leveling.css">
+</head>
+<body>
+    <div id="app">
+        <div class="sl-root">
+            <div class="sl-grid-bg"></div>
+            
+            <div class="sl-container">
+                <section class="sl-card sl-leaderboard-card">
+                    <!-- Subtle back button so it doesn't stand out too much -->
+                    <div class="sl-nav-btn" onclick="window.location.href='/'">
+                        &#x25C0; BACK TO SYSTEM
+                    </div>
+                    
+                    <div class="sl-leaderboard-header">
+                        <div class="sl-auth-logo">🏆</div>
+                        <h2 class="sl-section-title" style="justify-content: center; margin-bottom: 5px;">
+                            GLOBAL RANKINGS
+                        </h2>
+                        <p class="sl-auth-subtitle">Top 100 Awakened Hunters</p>
+                    </div>
+
+                    <div id="leaderboard-list" class="sl-leaderboard-list">
+                        <div style="text-align: center; color: #60a5fa; padding: 40px; font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.1em;">
+                            FETCHING DATA...
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+        </div>
+    </div>
+    <script src="/static/leaderboard.js"></script>
+</body>
+</html>

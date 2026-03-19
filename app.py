@@ -350,5 +350,26 @@ def reset_profile():
     users_collection.update_one({"username": current_user.id}, {"$set": new_profile})
     return jsonify({"success": True, "message": "Profile reset to defaults."})
 
+@app.route("/leaderboard")
+def leaderboard_page():
+    return render_template("leaderboard.html")
+
+@app.route("/api/leaderboard", methods=["GET"])
+def get_leaderboard():
+    # Sort by level descending, then xp descending
+    users_cursor = users_collection.find({}, {"password": 0, "_id": 0}).sort([("level", -1), ("xp", -1)]).limit(100)
+    leaderboard = []
+    rank_count = 1
+    for u in users_cursor:
+        leaderboard.append({
+            "lb_rank": rank_count,
+            "hunter_name": u.get("hunter_name", u.get("username")),
+            "hunter_rank": u.get("rank", "E-Rank"),
+            "level": u.get("level", 1),
+            "xp": u.get("xp", 0)
+        })
+        rank_count += 1
+    return jsonify({"success": True, "leaderboard": leaderboard})
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
