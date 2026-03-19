@@ -9,6 +9,8 @@ const ICONS = {
 let bgmPlayer = null;
 const BGM_URL = '/static/dark_aira.mp3'; 
 
+let bgmInterval = null;
+
 function initBGM() {
     if (!bgmPlayer) {
         bgmPlayer = new Audio(BGM_URL);
@@ -17,27 +19,37 @@ function initBGM() {
     }
 }
 
-document.addEventListener('click', () => {
+function startBGM() {
     initBGM();
-    if (bgmPlayer) {
-        // Resume from last known position
-        const savedTime = localStorage.getItem('sl-bgm-time');
-        if (savedTime) bgmPlayer.currentTime = parseFloat(savedTime);
-
-        bgmPlayer.play().catch(e => {
-            console.error("Leaderboard BGM Error: Ensure /static/dark_aira.mp3 exists.", e);
-        });
-
-        // Sync time to localStorage every second
-        setInterval(() => {
-            if (bgmPlayer && !bgmPlayer.paused) {
-                localStorage.setItem('sl-bgm-time', bgmPlayer.currentTime);
-            }
-        }, 1000);
+    const savedTime = localStorage.getItem('sl-bgm-time');
+    if (savedTime && parseFloat(savedTime) > 0) {
+        bgmPlayer.currentTime = parseFloat(savedTime);
     }
-}, { once: true });
+    
+    bgmPlayer.play().then(() => {
+        if (!bgmInterval) {
+            bgmInterval = setInterval(() => {
+                if (bgmPlayer && !bgmPlayer.paused) {
+                    localStorage.setItem('sl-bgm-time', bgmPlayer.currentTime);
+                }
+            }, 1000);
+        }
+    }).catch(err => {
+        document.addEventListener('click', () => {
+            bgmPlayer.play();
+            if (!bgmInterval) {
+                bgmInterval = setInterval(() => {
+                    if (bgmPlayer && !bgmPlayer.paused) {
+                        localStorage.setItem('sl-bgm-time', bgmPlayer.currentTime);
+                    }
+                }, 1000);
+            }
+        }, { once: true });
+    });
+}
 
 async function initLeaderboard() {
+    startBGM();
     try {
         const res = await fetch(`${API_BASE}/api/leaderboard`);
         const data = await res.json();

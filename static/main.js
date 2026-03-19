@@ -44,6 +44,8 @@ const ICONS = {
     swords: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="14.5" y1="17.5" x2="3" y2="6"></line><line x1="14.5" y1="6.5" x2="3" y2="18"></line></svg>`
 };
 
+let bgmInterval = null;
+
 function initBGM() {
     if (!state.bgmPlayer) {
         state.bgmPlayer = new Audio(BGM_URL);
@@ -52,29 +54,37 @@ function initBGM() {
     }
 }
 
-// Global click listener to unlock audio (browser requirement)
-document.addEventListener('click', () => {
+function startBGM() {
     initBGM();
-    if (state.bgmPlayer) {
-        // Resume from last known position
-        const savedTime = localStorage.getItem('sl-bgm-time');
-        if (savedTime) state.bgmPlayer.currentTime = parseFloat(savedTime);
-        
-        state.bgmPlayer.play().catch(e => {
-            console.error("BGM Play Error: Make sure /static/dark_aira.mp3 exists.", e);
-        });
-
-        // Sync time to localStorage every second
-        setInterval(() => {
-            if (state.bgmPlayer && !state.bgmPlayer.paused) {
-                localStorage.setItem('sl-bgm-time', state.bgmPlayer.currentTime);
-            }
-        }, 1000);
+    const savedTime = localStorage.getItem('sl-bgm-time');
+    if (savedTime && parseFloat(savedTime) > 0) {
+        state.bgmPlayer.currentTime = parseFloat(savedTime);
     }
-}, { once: true });
-
+    
+    state.bgmPlayer.play().then(() => {
+        if (!bgmInterval) {
+            bgmInterval = setInterval(() => {
+                if (state.bgmPlayer && !state.bgmPlayer.paused) {
+                    localStorage.setItem('sl-bgm-time', state.bgmPlayer.currentTime);
+                }
+            }, 1000);
+        }
+    }).catch(err => {
+        document.addEventListener('click', () => {
+            state.bgmPlayer.play();
+            if (!bgmInterval) {
+                bgmInterval = setInterval(() => {
+                    if (state.bgmPlayer && !state.bgmPlayer.paused) {
+                        localStorage.setItem('sl-bgm-time', state.bgmPlayer.currentTime);
+                    }
+                }, 1000);
+            }
+        }, { once: true });
+    });
+}
 
 async function init() {
+    startBGM();
     await checkAuth();
 }
 
