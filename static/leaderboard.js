@@ -14,9 +14,20 @@ function initBGM() {
 document.addEventListener('click', () => {
     initBGM();
     if (bgmPlayer) {
+        // Resume from last known position
+        const savedTime = localStorage.getItem('sl-bgm-time');
+        if (savedTime) bgmPlayer.currentTime = parseFloat(savedTime);
+
         bgmPlayer.play().catch(e => {
-            console.error("Leaderboard BGM Error: Ensure /static/dark_aria.mp3 exists.", e);
+            console.error("Leaderboard BGM Error: Ensure /static/dark_aira.mp3 exists.", e);
         });
+
+        // Sync time to localStorage every second
+        setInterval(() => {
+            if (bgmPlayer && !bgmPlayer.paused) {
+                localStorage.setItem('sl-bgm-time', bgmPlayer.currentTime);
+            }
+        }, 1000);
     }
 }, { once: true });
 
