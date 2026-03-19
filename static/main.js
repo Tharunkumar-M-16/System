@@ -195,11 +195,9 @@ function renderDashboard(container) {
     container.innerHTML = `
         <!-- ── Profile Card ── -->
         <section class="sl-card sl-profile-card">
-          <div style="position: absolute; top: 18px; right: 18px; display: flex; gap: 12px; align-items: center;">
-            <div class="sl-nav-btn" onclick="window.location.href='/leaderboard'" style="font-size: 8px; letter-spacing: 0.15em; color: #64748b; cursor: pointer; text-transform: uppercase; transition: color 0.2s;">
-              LEADERBOARD
-            </div>
+          <div class="sl-top-nav">
             <div class="sl-logout-btn" onclick="logout()">LOGOUT</div>
+            <div class="sl-nav-btn" onclick="window.location.href='/leaderboard'">⚔ LEADERBOARD</div>
           </div>
           <div class="sl-profile-header">
             <div class="sl-avatar">
