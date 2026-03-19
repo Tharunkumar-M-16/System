@@ -23,6 +23,7 @@ const SFX_URLS = {
 const BGM_VIDEO_ID = 'm02d6iOAtY8'; 
 
 function onYouTubeIframeAPIReady() {
+    console.log("YouTube API Ready");
     state.ytPlayer = new YT.Player('yt-player', {
         height: '0',
         width: '0',
@@ -30,19 +31,34 @@ function onYouTubeIframeAPIReady() {
         playerVars: {
             'autoplay': 0,
             'loop': 1,
-            'playlist': BGM_VIDEO_ID
+            'playlist': BGM_VIDEO_ID,
+            'controls': 0,
+            'showinfo': 0,
+            'rel': 0
         },
         events: {
-            'onReady': () => { state.ytReady = true; }
+            'onReady': () => { 
+                console.log("YouTube Player Ready for video: ", BGM_VIDEO_ID);
+                state.ytReady = true; 
+            },
+            'onStateChange': (event) => {
+                console.log("YouTube Player State Change: ", event.data);
+            },
+            'onError': (e) => {
+                console.error("YouTube Player Error: ", e.data);
+            }
         }
     });
 }
 
 // Global click listener to unlock audio (browser requirement)
 document.addEventListener('click', () => {
+    console.log("First click detected. Attempting to start BGM...");
     if (state.ytReady && state.ytPlayer) {
-        state.ytPlayer.setVolume(20);
+        state.ytPlayer.setVolume(50);
         state.ytPlayer.playVideo();
+    } else {
+        console.warn("YouTube Player not ready yet. Ready status:", state.ytReady);
     }
 }, { once: true });
 
