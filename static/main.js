@@ -524,7 +524,7 @@ function renderDashboard(container) {
             DAILY QUEST · DAY ${day}
             <span class="sl-section-line"></span>
           </h2>
-          <p class="sl-quest-subtitle">THE ${phase.rank.toUpperCase()} ${phase.title.toUpperCase()}</p>
+          <p class="sl-quest-subtitle">THE ${(phase.rank || '').toUpperCase()} ${(phase.title || '').toUpperCase()}</p>
 
           <ul class="sl-quest-list">
             ${quests.map(q => {
@@ -579,17 +579,17 @@ function renderDashboard(container) {
         <section class="sl-card sl-rankup-card">
           <div class="sl-rankup-top">
             <span class="sl-rankup-tag">NEXT GATE</span>
-            <span class="sl-rankup-glow-tag">DAY ${phase.levelup_day} · ${phase.next_rank.toUpperCase()}</span>
+            <span class="sl-rankup-glow-tag">DAY ${phase.levelup_day || 0} · ${(phase.next_rank || '').toUpperCase()}</span>
           </div>
-          <h3 class="sl-rankup-title">${phase.levelup_req.toUpperCase()}</h3>
+          <h3 class="sl-rankup-title">${(phase.levelup_req || '').toUpperCase()}</h3>
           <p class="sl-rankup-desc">
-            Complete Day ${phase.levelup_day} to advance from <span class="sl-hl">${phase.current_rank}</span> to <span class="sl-hl">${phase.next_rank}</span>.
+            Complete Day ${phase.levelup_day || 0} to advance from <span class="sl-hl">${phase.current_rank || ''}</span> to <span class="sl-hl">${phase.next_rank || ''}</span>.
           </p>
           <div class="sl-rankup-reward">
             <span class="sl-rankup-reward-label">REWARDS</span>
             <div class="sl-rankup-reward-items">
               <span class="sl-reward-item">+50 BONUS XP</span>
-              <span class="sl-reward-item">${phase.next_rank.toUpperCase()} RANK</span>
+              <span class="sl-reward-item">${(phase.next_rank || '').toUpperCase()} RANK</span>
             </div>
           </div>
         </section>
@@ -616,7 +616,7 @@ function renderDashboard(container) {
                 ${p.inventory && p.inventory.length > 0 ? p.inventory.map(item => `
                     <div class="sl-item" title="${item.name}: ${item.bonus}">
                         <span class="sl-item-icon">${ICONS[item.icon] || ICONS.scroll}</span>
-                        <div class="sl-item-glow rarity-${item.rarity.toLowerCase()}"></div>
+                        <div class="sl-item-glow rarity-${(item.rarity || 'common').toLowerCase()}"></div>
                     </div>
                 `).join("") : '<p class="sl-empty-text">Inventory is empty...</p>'}
             </div>
@@ -738,8 +738,8 @@ function showIdCard() {
                         ${ICONS.id_card}
                     </div>
                     <div class="sl-id-details">
-                        <div class="sl-id-row"><span class="sl-id-label">NAME</span> <span class="sl-id-val">${p.hunter_name.toUpperCase()}</span></div>
-                        <div class="sl-id-row"><span class="sl-id-label">RANK</span> <span class="sl-id-val" style="color:#60a5fa">${p.rank.toUpperCase()}</span></div>
+                        <div class="sl-id-row"><span class="sl-id-label">NAME</span> <span class="sl-id-val">${(p.hunter_name || 'HUNTER').toUpperCase()}</span></div>
+                        <div class="sl-id-row"><span class="sl-id-label">RANK</span> <span class="sl-id-val" style="color:#60a5fa">${(p.rank || 'E-RANK').toUpperCase()}</span></div>
                         <div class="sl-id-row"><span class="sl-id-label">CLASS</span> <span class="sl-id-val">${pClass}</span></div>
                         <div class="sl-id-row"><span class="sl-id-label">LEVEL</span> <span class="sl-id-val">${p.level}</span></div>
                         <div class="sl-id-row"><span class="sl-id-label">GUILD</span> <span class="sl-id-val">SOLO</span></div>
