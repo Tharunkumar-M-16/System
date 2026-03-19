@@ -168,6 +168,22 @@ ABILITY_UNLOCKS = {
     75: "Kamish's Wrath — Unlock extreme endurance challenges",
 }
 
+SPECIAL_QUESTS = [
+    {"id": "talk", "title": "Social Link", "desc": "Initiate a conversation with a stranger or reconnect with an old friend.", "category": "COMMUNICATION"},
+    {"id": "sport", "title": "Athletic Prowess", "desc": "Play a sport or run 2km extra at a high pace.", "category": "SPORT"},
+    {"id": "study", "title": "Forbidden Knowledge", "desc": "Read 20 pages of a book or learn a new technical skill.", "category": "INTELLECT"},
+    {"id": "explore", "title": "Dungeon Scouting", "desc": "Explore a part of your city you've never visited before.", "category": "EXPLORATION"},
+    {"id": "help", "title": "Protector Mode", "desc": "Help someone in need or perform an act of kindness.", "category": "EMPATHY"},
+]
+
+SPECIAL_ITEMS = [
+    {"id": "ring", "name": "Monarch's Ring", "icon": "💍", "rarity": "LEGENDARY", "bonus": "+2 All Stats"},
+    {"id": "key", "name": "Cartenon Key", "icon": "🔑", "rarity": "EPIC", "bonus": "Unknown Power"},
+    {"id": "elixir", "name": "Elixir of Life", "icon": "🧪", "rarity": "RARE", "bonus": "+10 VIT"},
+    {"id": "essence", "name": "Magic Essence", "icon": "💎", "rarity": "RARE", "bonus": "+10 INT"},
+    {"id": "scroll", "name": "Recovery Scroll", "icon": "📜", "rarity": "UNCOMMON", "bonus": "Reset Fatigue"},
+]
+
 DEFAULT_STATS = {"STR": 5, "INT": 20, "AGI": 5, "VIT": 10, "WIL": 10}
 XP_PER_DAILY = 10
 STREAK_BONUS_EVERY = 7
@@ -198,6 +214,9 @@ def _get_default_profile(username):
         "quest_history": [],
         "abilities_unlocked": [],
         "shadow_army": [],
+        "inventory": [],
+        "last_completion": None,
+        "special_quest": None, # { id, accepted, completed_today }
     }
 
 def _rank_for_level(level):
@@ -297,6 +316,20 @@ def index():
 @login_required
 def get_status():
     user_doc = users_collection.find_one({"username": current_user.id}, {"password": 0, "_id": 0})
+    
+    # Penalty Check: Reset streak if > 48h since last completion
+    if user_doc.get("last_completion") and user_doc.get("daily_completed_streak", 0) > 0:
+        last_dt = datetime.fromisoformat(user_doc["last_completion"].replace("Z", ""))
+        diff = datetime.utcnow() - last_dt
+        if diff.total_seconds() > (48 * 3600):
+            # Penalty! Reset streak
+            user_doc["daily_completed_streak"] = 0
+            user_doc["xp"] = max(0, user_doc.get("xp", 0) - 50)
+            users_collection.update_one({"username": current_user.id}, {"$set": {
+                "daily_completed_streak": 0,
+                "xp": user_doc["xp"]
+            }})
+
     # Attach phase info
     day = user_doc.get("daily_completed_streak", 0) + 1  # next day to complete
     phase = _get_current_phase(day)
@@ -343,6 +376,22 @@ def complete_daily():
         "levelled_up": levelled_up,
     }
     data["quest_history"].append(entry)
+    data["last_completion"] = datetime.utcnow().isoformat() + "Z"
+
+    # Trigger Special Quest Chance (50%) if not already completed/active today
+    special_trigger = False
+    if not data.get("special_quest") or not data["special_quest"].get("completed_today"):
+        if random.random() < 0.5:
+            sq = random.choice(SPECIAL_QUESTS)
+            data["special_quest"] = {
+                "id": sq["id"],
+                "title": sq["title"],
+                "desc": sq["desc"],
+                "category": sq["category"],
+                "accepted": False,
+                "completed_today": False
+            }
+            special_trigger = True
 
     users_collection.update_one({"username": current_user.id}, {"$set": data})
 
@@ -354,7 +403,10 @@ def complete_daily():
         "level": data["level"],
         "rank": data["rank"],
         "phase": phase["rank"],
+        "special_trigger": special_trigger,
+        "special_quest_data": data.get("special_quest") if special_trigger else None
     }
+    
     if streak_bonus:
         response["streak_bonus"] = f"+{streak_bonus} XP for {streak}-day streak!"
     if levelled_up:
@@ -392,6 +444,37 @@ def assign_stats():
     
     users_collection.update_one({"username": current_user.id}, {"$set": user_doc})
     return jsonify({"success": True, "stats": user_doc["stats"], "stat_points": user_doc["stat_points"]})
+
+@app.route("/api/accept-special-quest", methods=["POST"])
+@login_required
+def accept_special():
+    user_doc = users_collection.find_one({"username": current_user.id})
+    if user_doc.get("special_quest"):
+        user_doc["special_quest"]["accepted"] = True
+        users_collection.update_one({"username": current_user.id}, {"$set": {"special_quest": user_doc["special_quest"]}})
+        return jsonify({"success": True})
+    return jsonify({"success": False, "error": "No special quest available"}), 400
+
+@app.route("/api/complete-special-quest", methods=["POST"])
+@login_required
+def complete_special():
+    user_doc = users_collection.find_one({"username": current_user.id})
+    if user_doc.get("special_quest") and user_doc["special_quest"]["accepted"]:
+        # Award special item
+        item = random.choice(SPECIAL_ITEMS).copy()
+        item["earned_at"] = datetime.utcnow().isoformat() + "Z"
+        user_doc.setdefault("inventory", []).append(item)
+        
+        # Mark as completed
+        user_doc["special_quest"]["completed_today"] = True
+        user_doc["special_quest"]["accepted"] = False
+        
+        users_collection.update_one({"username": current_user.id}, {"$set": {
+            "inventory": user_doc["inventory"],
+            "special_quest": user_doc["special_quest"]
+        }})
+        return jsonify({"success": True, "item": item})
+    return jsonify({"success": False, "error": "No active special quest"}), 400
 
 @app.route("/leaderboard")
 def leaderboard_page():

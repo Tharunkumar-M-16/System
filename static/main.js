@@ -157,6 +157,11 @@ async function claimRewards() {
                 playSFX('quest_complete');
             }
 
+            // Check for Special Quest Trigger
+            if (data.special_trigger) {
+                showSpecialQuestPopup(data.special_quest_data);
+            }
+
             // Keep rewardData visible after profile refresh
             state.rewardData = data;
         } else {
@@ -168,6 +173,29 @@ async function claimRewards() {
         state.claiming = false;
         render();
     }
+}
+
+function showSpecialQuestPopup(quest) {
+    const existing = document.getElementById('special-popup');
+    if (existing) existing.remove();
+
+    const popup = document.createElement('div');
+    popup.id = 'special-popup';
+    popup.className = 'sl-special-popup-overlay';
+    popup.innerHTML = `
+        <div class="sl-special-popup">
+            <div class="sl-popup-warning">⚠️ SPECIAL QUEST DETECTED ⚠️</div>
+            <h2 class="sl-popup-title">${quest.title}</h2>
+            <p class="sl-popup-cat">[TYPE: ${quest.category}]</p>
+            <p class="sl-popup-desc">${quest.desc}</p>
+            <div class="sl-popup-footer">
+                <button class="sl-popup-btn sl-btn-accept" onclick="acceptSpecialQuest()">ACCEPT</button>
+                <button class="sl-popup-btn sl-btn-ignore" onclick="this.parentElement.parentElement.parentElement.remove()">IGNORE</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(popup);
+    playSFX('error'); // Use system buzz for warning
 }
 
 async function assignStat(stat) {
@@ -186,6 +214,38 @@ async function assignStat(stat) {
         }
     } catch (err) {
         console.error("Failed to assign stat:", err);
+    }
+}
+
+async function acceptSpecialQuest() {
+    try {
+        const res = await fetch(`${API_BASE}/api/accept-special-quest`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            await fetchProfile();
+            render();
+            // Close any popups if they exist
+            const popup = document.getElementById('special-popup');
+            if (popup) popup.remove();
+        }
+    } catch (err) {
+        console.error("Failed to accept special quest:", err);
+    }
+}
+
+async function completeSpecialQuest() {
+    try {
+        playSFX('click');
+        const res = await fetch(`${API_BASE}/api/complete-special-quest`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            playSFX('level_up'); // Use level up sound for item gain
+            alert(`OBTAINED: ${data.item.icon} ${data.item.name}!`);
+            await fetchProfile();
+            render();
+        }
+    } catch (err) {
+        console.error("Failed to complete special quest:", err);
     }
 }
 
@@ -477,6 +537,33 @@ function renderDashboard(container) {
           </div>
         </section>
         ` : ''}
+
+        <!-- ── Active Special Quest ── -->
+        ${p.special_quest && p.special_quest.accepted && !p.special_quest.completed_today ? `
+        <section class="sl-card sl-special-quest-card">
+            <h3 class="sl-section-title"><span>✦</span> SPECIAL QUEST ACTIVE</h3>
+            <div class="sl-special-content">
+                <div class="sl-special-info">
+                    <p class="sl-special-title">${p.special_quest.title}</p>
+                    <p class="sl-special-desc">${p.special_quest.desc}</p>
+                </div>
+                <button class="sl-claim-btn sl-claim-active" onclick="completeSpecialQuest()">COMPLETE QUEST</button>
+            </div>
+        </section>
+        ` : ''}
+
+        <!-- ── Inventory ── -->
+        <section class="sl-card sl-inventory-card">
+            <h3 class="sl-section-title"><span>📦</span> HUNTER'S INVENTORY</h3>
+            <div class="sl-inventory-grid">
+                ${p.inventory && p.inventory.length > 0 ? p.inventory.map(item => `
+                    <div class="sl-item" title="${item.name}: ${item.bonus}">
+                        <span class="sl-item-icon">${item.icon}</span>
+                        <div class="sl-item-glow rarity-${item.rarity.toLowerCase()}"></div>
+                    </div>
+                `).join("") : '<p class="sl-empty-text">Inventory is empty...</p>'}
+            </div>
+        </section>
     `;
 }
 
@@ -487,5 +574,7 @@ window.handleAuth = handleAuth;
 window.switchAuthMode = switchAuthMode;
 window.logout = logout;
 window.assignStat = assignStat;
+window.acceptSpecialQuest = acceptSpecialQuest;
+window.completeSpecialQuest = completeSpecialQuest;
 
 init();
