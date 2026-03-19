@@ -22,8 +22,11 @@
         </div>
     </div>
     <script src="/static/main.js"></script>
+    <div id="yt-player" style="position: absolute; width: 0; height: 0; pointer-events: none; opacity: 0; border: none;"></div>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         // Block all zoom gestures
+
         document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
         document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
         document.addEventListener('gestureend', function(e) { e.preventDefault(); });

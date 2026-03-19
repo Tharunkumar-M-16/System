@@ -5,7 +5,8 @@ let state = {
     checked: [],
     claiming: false,
     rewardData: null,
-    bgmPlayer: null,
+    ytPlayer: null,
+    ytReady: false,
     authMode: 'login',
     loggedIn: false
 };
@@ -18,24 +19,35 @@ const SFX_URLS = {
     'click': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' // Subtle click
 };
 
-// Dark Aria / System Theme Placeholder
-const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; 
+// YouTube Video ID for Dark Aria
+const BGM_VIDEO_ID = 'm02d6iOAtY8'; 
 
-function initBGM() {
-    if (!state.bgmPlayer) {
-        state.bgmPlayer = new Audio(BGM_URL);
-        state.bgmPlayer.loop = true;
-        state.bgmPlayer.volume = 0.15;
-    }
+function onYouTubeIframeAPIReady() {
+    state.ytPlayer = new YT.Player('yt-player', {
+        height: '0',
+        width: '0',
+        videoId: BGM_VIDEO_ID,
+        playerVars: {
+            'autoplay': 0,
+            'loop': 1,
+            'playlist': BGM_VIDEO_ID
+        },
+        events: {
+            'onReady': () => { state.ytReady = true; }
+        }
+    });
 }
 
 // Global click listener to unlock audio (browser requirement)
 document.addEventListener('click', () => {
-    initBGM();
-    if (state.bgmPlayer.paused) {
-        state.bgmPlayer.play().catch(e => console.log("BGM check: ", e));
+    if (state.ytReady && state.ytPlayer) {
+        state.ytPlayer.setVolume(20);
+        state.ytPlayer.playVideo();
     }
 }, { once: true });
+
+// Expose to window for YT API
+window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 
 
 async function init() {

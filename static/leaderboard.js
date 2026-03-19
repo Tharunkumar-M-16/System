@@ -1,5 +1,34 @@
 const API_BASE = "";
 
+let ytPlayer = null;
+let ytReady = false;
+const BGM_VIDEO_ID = 'm02d6iOAtY8'; 
+
+function onYouTubeIframeAPIReady() {
+    ytPlayer = new YT.Player('yt-player', {
+        height: '0',
+        width: '0',
+        videoId: BGM_VIDEO_ID,
+        playerVars: {
+            'autoplay': 0,
+            'loop': 1,
+            'playlist': BGM_VIDEO_ID
+        },
+        events: {
+            'onReady': () => { ytReady = true; }
+        }
+    });
+}
+
+document.addEventListener('click', () => {
+    if (ytReady && ytPlayer) {
+        ytPlayer.setVolume(20);
+        ytPlayer.playVideo();
+    }
+}, { once: true });
+
+window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+
 async function initLeaderboard() {
     try {
         const res = await fetch(`${API_BASE}/api/leaderboard`);
