@@ -19,8 +19,9 @@ const SFX_URLS = {
     'click': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' // Subtle click
 };
 
-// YouTube Video ID for Dark Aria
-const BGM_VIDEO_ID = 'm02d6iOAtY8'; 
+// YouTube Video IDs for Dark Aria (Primary and Fallback)
+const BGM_VIDEO_ID = 'uK7Yw0CqK9w'; 
+const FALLBACK_BGM_ID = 'm02d6iOAtY8';
 
 function onYouTubeIframeAPIReady() {
     console.log("YouTube API Ready");
@@ -42,10 +43,16 @@ function onYouTubeIframeAPIReady() {
                 state.ytReady = true; 
             },
             'onStateChange': (event) => {
-                console.log("YouTube Player State Change: ", event.data);
+                if (event.data === YT.PlayerState.PAUSED && state.ytReady) {
+                    // Try to resume if it was paused by browser policy
+                    state.ytPlayer.playVideo();
+                }
             },
             'onError': (e) => {
-                console.error("YouTube Player Error: ", e.data);
+                console.error("YouTube Player Error: ", e.data, " - Attempting fallback...");
+                if (state.ytPlayer && e.data !== 2) {
+                    state.ytPlayer.loadVideoById(FALLBACK_BGM_ID);
+                }
             }
         }
     });

@@ -2,9 +2,11 @@ const API_BASE = "";
 
 let ytPlayer = null;
 let ytReady = false;
-const BGM_VIDEO_ID = 'm02d6iOAtY8'; 
+const BGM_VIDEO_ID = 'uK7Yw0CqK9w'; 
+const FALLBACK_BGM_ID = 'm02d6iOAtY8';
 
 function onYouTubeIframeAPIReady() {
+    console.log("Leaderboard: YouTube API Ready");
     ytPlayer = new YT.Player('yt-player', {
         height: '0',
         width: '0',
@@ -12,17 +14,33 @@ function onYouTubeIframeAPIReady() {
         playerVars: {
             'autoplay': 0,
             'loop': 1,
-            'playlist': BGM_VIDEO_ID
+            'playlist': BGM_VIDEO_ID,
+            'controls': 0,
+            'showinfo': 0,
+            'rel': 0
         },
         events: {
-            'onReady': () => { ytReady = true; }
+            'onReady': () => { 
+                console.log("Leaderboard: YouTube Player Ready");
+                ytReady = true; 
+            },
+            'onStateChange': (e) => { 
+                if (e.data === YT.PlayerState.PAUSED && ytReady) {
+                    ytPlayer.playVideo();
+                }
+            },
+            'onError': (e) => { 
+                console.error("LB YT Error:", e.data, " - Attempting fallback...");
+                if (ytPlayer) ytPlayer.loadVideoById(FALLBACK_BGM_ID);
+            }
         }
     });
 }
 
 document.addEventListener('click', () => {
+    console.log("Leaderboard: Click detected, playing BGM...");
     if (ytReady && ytPlayer) {
-        ytPlayer.setVolume(20);
+        ytPlayer.setVolume(50);
         ytPlayer.playVideo();
     }
 }, { once: true });
