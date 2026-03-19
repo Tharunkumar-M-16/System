@@ -1,5 +1,11 @@
 const API_BASE = "";
 
+const ICONS = {
+    gold: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fcd34d" stroke="#b45309" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+    silver: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#e2e8f0" stroke="#64748b" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+    bronze: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fb923c" stroke="#9a3412" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+};
+
 let bgmPlayer = null;
 const BGM_URL = '/static/dark_aira.mp3'; 
 
@@ -69,17 +75,15 @@ function renderLeaderboard(leaderboardData) {
 
     const html = leaderboardData.map((hunter, index) => {
         let rankClass = "";
-        let rankIcon = "";
-        
         if (index === 0) {
             rankClass = "sl-lb-gold";
-            rankIcon = "[ 1ST ] ";
+            rankIcon = `<span style="margin-right:8px; display:inline-flex; align-items:center;">${ICONS.gold}</span>`;
         } else if (index === 1) {
             rankClass = "sl-lb-silver";
-            rankIcon = "[ 2ND ] ";
+            rankIcon = `<span style="margin-right:8px; display:inline-flex; align-items:center;">${ICONS.silver}</span>`;
         } else if (index === 2) {
             rankClass = "sl-lb-bronze";
-            rankIcon = "[ 3RD ] ";
+            rankIcon = `<span style="margin-right:8px; display:inline-flex; align-items:center;">${ICONS.bronze}</span>`;
         }
 
         return `

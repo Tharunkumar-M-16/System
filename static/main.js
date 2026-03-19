@@ -384,15 +384,15 @@ function renderDashboard(container) {
               <div class="sl-avatar-ring"></div>
             </div>
             <div class="sl-profile-info">
-              <p class="sl-subtitle">PLAYER STATUS · DAY ${p.daily_completed_streak} / 100</p>
-              <h1 class="sl-name sl-glitch" data-text="${p.hunter_name.toUpperCase()}">
-                  <span class="sl-title-badge" onclick="showTitleModal()">${p.active_title_display.toUpperCase()}</span>
-                  ${p.hunter_name.toUpperCase()}
+              <p class="sl-subtitle">PLAYER STATUS · DAY ${p.daily_completed_streak || 0} / 100</p>
+              <h1 class="sl-name sl-glitch" data-text="${(p.hunter_name || 'HUNTER').toUpperCase()}">
+                  <span class="sl-title-badge" onclick="showTitleModal()">${(p.active_title_display || 'THE WEAKEST HUNTER').toUpperCase()}</span>
+                  ${(p.hunter_name || 'HUNTER').toUpperCase()}
               </h1>
               <div class="sl-badges">
-                <span class="sl-badge sl-badge-rank">[ ${phase.rank.toUpperCase()} ]</span>
-                <span class="sl-badge sl-badge-level">LVL ${p.level}</span>
-                <span class="sl-badge sl-badge-phase">PHASE ${phase.phase_id}</span>
+                <span class="sl-badge sl-badge-rank">[ ${(phase.rank || 'E-Rank').toUpperCase()} ]</span>
+                <span class="sl-badge sl-badge-level">LVL ${p.level || 1}</span>
+                <span class="sl-badge sl-badge-phase">PHASE ${phase.phase_id || 1}</span>
                 <span class="sl-badge sl-badge-id" onclick="showIdCard()">${ICONS.id_card} LICENSE</span>
               </div>
             </div>
@@ -400,7 +400,7 @@ function renderDashboard(container) {
 
           <div class="sl-title-row">
             <span class="sl-title-label">PHASE</span>
-            <span class="sl-title-value">${phase.title.toUpperCase()}</span>
+            <span class="sl-title-value">${(phase.title || '').toUpperCase()}</span>
           </div>
 
           <div class="sl-xp-section">
@@ -435,7 +435,7 @@ function renderDashboard(container) {
         <section class="sl-card sl-phase-card">
           <h2 class="sl-section-title">
             <span class="sl-section-line"></span>
-            ${phase.rank.toUpperCase()} · ${phase.days.toUpperCase()}
+            ${(phase.rank || '').toUpperCase()} · ${(phase.days || '').toUpperCase()}
             <span class="sl-section-line"></span>
           </h2>
           <p class="sl-phase-focus">
