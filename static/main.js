@@ -21,6 +21,29 @@ const SFX_URLS = {
 // Local BGM: Place your "dark_aira.mp3" in the static folder
 const BGM_URL = '/static/dark_aira.mp3'; 
 
+const ICONS = {
+    str: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"></path><path d="M13 19l6-6"></path><path d="M16 16l4 4"></path><path d="M19 21l2-2"></path></svg>`,
+    agi: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`,
+    vit: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+    int: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`,
+    wil: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>`,
+    ring: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="4" r="2"></circle></svg>`,
+    key: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>`,
+    potion: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31"></path><path d="M14 9.3V1.99"></path><path d="M8.5 2h7"></path><path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path><path d="M5.52 16h12.96"></path></svg>`,
+    crystal: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
+    scroll: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>`,
+    knight: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 8v4"></path></svg>`,
+    beast: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>`,
+    shield: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+    dragon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`,
+    ant: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="19" r="4"></circle><path d="M12 15v-1"></path><path d="M12 9v-2"></path><path d="M9 12H5"></path><path d="M19 12h-4"></path><path d="M10.5 14L8 16"></path><path d="M13.5 14l2.5 2"></path><path d="M10.5 10L8 8"></path><path d="M13.5 10l2.5-2"></path></svg>`,
+    mage: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"></circle><path d="M3 21v-2a7 7 0 0 1 14 0v2"></path><path d="M12 13v8"></path><path d="M8 17l8-4"></path></svg>`,
+    king: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+    box: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`,
+    id_card: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect><circle cx="9" cy="10" r="2"></circle><line x1="15" y1="8" x2="19" y2="8"></line><line x1="15" y1="12" x2="19" y2="12"></line><line x1="5" y1="16" x2="19" y2="16"></line></svg>`,
+    swords: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="14.5" y1="17.5" x2="3" y2="6"></line><line x1="14.5" y1="6.5" x2="3" y2="18"></line></svg>`
+};
+
 function initBGM() {
     if (!state.bgmPlayer) {
         state.bgmPlayer = new Audio(BGM_URL);
@@ -285,7 +308,7 @@ function render() {
 function renderAuth(container) {
     container.innerHTML = `
         <section class="sl-card auth-card">
-            <div class="sl-auth-logo">⚔️</div>
+            <div class="sl-auth-logo">${ICONS.swords}</div>
             <h2 class="sl-section-title" style="justify-content: center; margin-bottom: 5px;">
                 ${state.authMode === 'login' ? 'IDENTITY VERIFICATION' : 'HUNTER REGISTRATION'}
             </h2>
@@ -324,11 +347,11 @@ function renderDashboard(container) {
     const progressPct = Math.min(100, Math.round((p.daily_completed_streak / 100) * 100));
 
     const uiStats = [
-        { key: "STR", label: "STRENGTH", value: p.stats.STR, icon: "⚔️" },
-        { key: "INT", label: "INTELLIGENCE", value: p.stats.INT, icon: "🧠" },
-        { key: "AGI", label: "AGILITY", value: p.stats.AGI, icon: "💨" },
-        { key: "VIT", label: "VITALITY", value: p.stats.VIT, icon: "❤️" },
-        { key: "WIL", label: "WILLPOWER", value: p.stats.WIL, icon: "🔥" },
+        { key: "STR", label: "STRENGTH", value: p.stats.STR, icon: ICONS.str },
+        { key: "INT", label: "INTELLIGENCE", value: p.stats.INT, icon: ICONS.int },
+        { key: "AGI", label: "AGILITY", value: p.stats.AGI, icon: ICONS.agi },
+        { key: "VIT", label: "VITALITY", value: p.stats.VIT, icon: ICONS.vit },
+        { key: "WIL", label: "WILLPOWER", value: p.stats.WIL, icon: ICONS.wil },
     ];
 
     const shadowArmy = p.shadow_army || [];
@@ -348,7 +371,7 @@ function renderDashboard(container) {
             <div class="sl-nav-row">
                 <div class="sl-logout-btn" onclick="logout()">LOGOUT</div>
             </div>
-            <div class="sl-nav-btn" onclick="window.location.href='/leaderboard'">⚔ LEADERBOARD</div>
+            <div class="sl-nav-btn" onclick="window.location.href='/leaderboard'">${ICONS.swords} LEADERBOARD</div>
           </div>
           <div class="sl-profile-header">
             <div class="sl-avatar">
@@ -362,11 +385,15 @@ function renderDashboard(container) {
             </div>
             <div class="sl-profile-info">
               <p class="sl-subtitle">PLAYER STATUS · DAY ${p.daily_completed_streak} / 100</p>
-              <h1 class="sl-name">HUNTER <span class="sl-name-accent">${p.hunter_name.toUpperCase()}</span></h1>
+              <h1 class="sl-name sl-glitch" data-text="${p.hunter_name.toUpperCase()}">
+                  <span class="sl-title-badge" onclick="showTitleModal()">${p.active_title_display.toUpperCase()}</span>
+                  ${p.hunter_name.toUpperCase()}
+              </h1>
               <div class="sl-badges">
-                <span class="sl-badge sl-badge-rank">${phase.rank.toUpperCase()}</span>
+                <span class="sl-badge sl-badge-rank">[ ${phase.rank.toUpperCase()} ]</span>
                 <span class="sl-badge sl-badge-level">LVL ${p.level}</span>
                 <span class="sl-badge sl-badge-phase">PHASE ${phase.phase_id}</span>
+                <span class="sl-badge sl-badge-id" onclick="showIdCard()">${ICONS.id_card} LICENSE</span>
               </div>
             </div>
           </div>
@@ -415,7 +442,7 @@ function renderDashboard(container) {
             <span class="sl-phase-focus-label">FOCUS:</span> ${phase.focus}
           </p>
           <div class="sl-levelup-req">
-            <span class="sl-levelup-label">⚡ LEVEL-UP REQUIREMENT (Day ${phase.levelup_day})</span>
+            <span class="sl-levelup-label">>>> LEVEL-UP REQUIREMENT (Day ${phase.levelup_day})</span>
             <span class="sl-levelup-text">${phase.levelup_req}</span>
           </div>
         </section>
@@ -430,7 +457,7 @@ function renderDashboard(container) {
           <div class="sl-stats-grid">
             ${points > 0 ? `
               <div class="sl-points-alert">
-                 <span class="sl-points-glow">✦ ${points} STATUS POINTS AVAILABLE</span>
+                 <span class="sl-points-glow">${ICONS.crystal} ${points} STATUS POINTS AVAILABLE</span>
               </div>
             ` : ''}
             ${uiStats.map(s => `
@@ -462,7 +489,7 @@ function renderDashboard(container) {
           <div class="sl-shadow-grid">
             ${shadowArmy.length > 0 ? shadowArmy.map(s => `
               <div class="sl-shadow-item">
-                <span class="sl-shadow-icon">${s.icon}</span>
+                <span class="sl-shadow-icon">${ICONS[s.icon] || ICONS.knight}</span>
                 <span class="sl-shadow-name">${s.name}</span>
               </div>
             `).join('') : `
@@ -470,6 +497,25 @@ function renderDashboard(container) {
             `}
           </div>
         </section>
+
+        <!-- ── Red Gate Raid ── -->
+        ${p.red_gate_active ? `
+        <section class="sl-card sl-red-gate-card sl-glitch">
+            <h2 class="sl-section-title" style="color: #ef4444; border-bottom-color: #ef4444;">
+              <span class="sl-section-line" style="background: #ef4444;"></span>
+              RED GATE DETECTED
+              <span class="sl-section-line" style="background: #ef4444;"></span>
+            </h2>
+            <p class="sl-quest-subtitle" style="color: #fca5a5;">WEEKLY RAID · MASSIVE THREAT</p>
+            <div class="sl-special-content" style="border-color: #7f1d1d; background: rgba(153, 27, 27, 0.1);">
+                <div class="sl-special-info">
+                    <p class="sl-special-title" style="color: #ef4444;">SURVIVE THE DUNGEON</p>
+                    <p class="sl-special-desc">Complete a massive personal objective today to clear the Red Gate and claim epic loot.</p>
+                </div>
+                <button class="sl-claim-btn" style="background: #991b1b; color: white;" onclick="completeRedGate()">RAID CLEARED</button>
+            </div>
+        </section>
+        ` : ''}
 
         <!-- ── Daily Quest Card ── -->
         <section class="sl-card sl-quest-card">
@@ -513,11 +559,11 @@ function renderDashboard(container) {
             onclick="claimRewards()"
             ${(!allDone || state.claiming || state.rewardData) ? 'disabled' : ''}
           >
-            ${state.rewardData ? '✦ REWARDS CLAIMED ✦' : state.claiming ? 'PROCESSING...' : allDone ? '✦ CLAIM REWARDS ✦' : 'COMPLETE ALL QUESTS'}
+            ${state.rewardData ? '[ REWARDS CLAIMED ]' : state.claiming ? 'PROCESSING...' : allDone ? '[ CLAIM REWARDS ]' : 'COMPLETE ALL QUESTS'}
           </button>
 
           ${state.rewardData ? `
-            <div class="sl-reward-popup">
+            <div class="sl-reward-popup sl-glitch">
               <p class="sl-reward-title">QUEST COMPLETE — DAY ${state.rewardData.streak}</p>
               <p class="sl-reward-text">+${state.rewardData.xp_earned} XP · ${state.rewardData.streak_bonus ? state.rewardData.streak_bonus : 'Daily Reward'}</p>
               ${state.rewardData.level_up ? `<p class="sl-reward-alt">${state.rewardData.level_up}</p>` : ''}
@@ -551,8 +597,8 @@ function renderDashboard(container) {
 
         <!-- ── Active Special Quest ── -->
         ${p.special_quest && p.special_quest.accepted && !p.special_quest.completed_today ? `
-        <section class="sl-card sl-special-quest-card">
-            <h3 class="sl-section-title"><span>✦</span> SPECIAL QUEST ACTIVE</h3>
+        <section class="sl-card sl-special-quest-card sl-glitch">
+            <h3 class="sl-section-title"><span>${ICONS.swords}</span> SPECIAL QUEST ACTIVE</h3>
             <div class="sl-special-content">
                 <div class="sl-special-info">
                     <p class="sl-special-title">${p.special_quest.title}</p>
@@ -565,11 +611,11 @@ function renderDashboard(container) {
 
         <!-- ── Inventory ── -->
         <section class="sl-card sl-inventory-card">
-            <h3 class="sl-section-title"><span>📦</span> HUNTER'S INVENTORY</h3>
+            <h3 class="sl-section-title"><span>${ICONS.box}</span> HUNTER'S INVENTORY</h3>
             <div class="sl-inventory-grid">
                 ${p.inventory && p.inventory.length > 0 ? p.inventory.map(item => `
                     <div class="sl-item" title="${item.name}: ${item.bonus}">
-                        <span class="sl-item-icon">${item.icon}</span>
+                        <span class="sl-item-icon">${ICONS[item.icon] || ICONS.scroll}</span>
                         <div class="sl-item-glow rarity-${item.rarity.toLowerCase()}"></div>
                     </div>
                 `).join("") : '<p class="sl-empty-text">Inventory is empty...</p>'}
@@ -587,5 +633,128 @@ window.logout = logout;
 window.assignStat = assignStat;
 window.acceptSpecialQuest = acceptSpecialQuest;
 window.completeSpecialQuest = completeSpecialQuest;
+window.showTitleModal = showTitleModal;
+window.selectTitle = selectTitle;
+window.showIdCard = showIdCard;
+window.completeRedGate = completeRedGate;
+
+function showTitleModal() {
+    const existing = document.getElementById('title-popup');
+    if (existing) existing.remove();
+
+    const p = state.profile;
+    const resolvedTitles = p.resolved_titles || [];
+
+    const popup = document.createElement('div');
+    popup.id = 'title-popup';
+    popup.className = 'sl-special-popup-overlay';
+    
+    const titlesHtml = resolvedTitles.map(t => `
+        <div class="sl-title-option ${p.active_title === t.id ? 'active' : ''}" onclick="selectTitle('${t.id}')">
+            <h4>${t.name} <span style="font-size:10px; color:#a1a1aa;">[${t.rarity}]</span></h4>
+            <p>${t.desc}</p>
+        </div>
+    `).join('');
+
+    popup.innerHTML = `
+        <div class="sl-special-popup" style="border-color: #3b82f6; box-shadow: 0 0 30px rgba(59,130,246,0.2);">
+            <h2 class="sl-popup-title" style="color: #60a5fa;">SELECT DESIGNATION</h2>
+            <div class="sl-title-list">
+                ${titlesHtml}
+            </div>
+            <div class="sl-popup-footer">
+                <button class="sl-popup-btn sl-btn-ignore" onclick="this.parentElement.parentElement.parentElement.remove()">CLOSE</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(popup);
+    playSFX('click');
+}
+
+async function selectTitle(titleId) {
+    try {
+        playSFX('click');
+        const res = await fetch(`${API_BASE}/api/change-title`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title_id: titleId })
+        });
+        const data = await res.json();
+        if (data.success) {
+            const popup = document.getElementById('title-popup');
+            if (popup) popup.remove();
+            await fetchProfile();
+            render();
+        }
+    } catch (err) {
+        console.error("Failed to change title:", err);
+    }
+}
+
+async function completeRedGate() {
+    try {
+        const res = await fetch(`${API_BASE}/api/complete-red-gate`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            playSFX('level_up');
+            alert(`RED GATE CLEARED!\nOBTAINED: ${data.item.name}\n${data.level > state.profile.level ? 'LEVEL UP!' : ''}`);
+            await fetchProfile();
+            render();
+        } else {
+            alert(data.error);
+        }
+    } catch (err) {
+        console.error("Failed red gate:", err);
+    }
+}
+
+function showIdCard() {
+    const existing = document.getElementById('id-popup');
+    if (existing) existing.remove();
+    
+    const p = state.profile;
+    const stats = p.stats;
+    let maxStat = 'STR';
+    let maxVal = stats['STR'];
+    for(let k in stats) {
+        if(stats[k] > maxVal) { maxVal = stats[k]; maxStat = k; }
+    }
+    const classMap = { 'STR': 'FIGHTER', 'AGI': 'ASSASSIN', 'INT': 'MAGE', 'VIT': 'TANK', 'WIL': 'HEALER' };
+    const pClass = classMap[maxStat] || 'FIGHTER';
+
+    const popup = document.createElement('div');
+    popup.id = 'id-popup';
+    popup.className = 'sl-special-popup-overlay sl-id-overlay';
+    
+    popup.innerHTML = `
+        <div class="sl-id-card-container">
+            <div class="sl-id-card sl-glitch">
+                <div class="sl-id-header">
+                    <div class="sl-id-logo">${ICONS.swords}</div>
+                    <div class="sl-id-title">HUNTER ASSOCIATION</div>
+                </div>
+                <div class="sl-id-body">
+                    <div class="sl-id-photo-placeholder">
+                        ${ICONS.id_card}
+                    </div>
+                    <div class="sl-id-details">
+                        <div class="sl-id-row"><span class="sl-id-label">NAME</span> <span class="sl-id-val">${p.hunter_name.toUpperCase()}</span></div>
+                        <div class="sl-id-row"><span class="sl-id-label">RANK</span> <span class="sl-id-val" style="color:#60a5fa">${p.rank.toUpperCase()}</span></div>
+                        <div class="sl-id-row"><span class="sl-id-label">CLASS</span> <span class="sl-id-val">${pClass}</span></div>
+                        <div class="sl-id-row"><span class="sl-id-label">LEVEL</span> <span class="sl-id-val">${p.level}</span></div>
+                        <div class="sl-id-row"><span class="sl-id-label">GUILD</span> <span class="sl-id-val">SOLO</span></div>
+                    </div>
+                </div>
+                <div class="sl-id-footer">
+                    <div class="sl-id-barcode" style="font-family: monospace; font-size: 14px; letter-spacing: 2px;">|||| |||||| || | |||| |||||| | || |||||</div>
+                    <div class="sl-id-issuance">ISSUED: KOREA H.A.</div>
+                </div>
+            </div>
+            <button class="sl-popup-btn sl-btn-ignore" style="margin-top: 20px; width: 100%; max-width: 350px;" onclick="this.parentElement.parentElement.remove()">CLOSE</button>
+        </div>
+    `;
+    document.body.appendChild(popup);
+    playSFX('stat_up');
+}
 
 init();

@@ -177,12 +177,20 @@ SPECIAL_QUESTS = [
 ]
 
 SPECIAL_ITEMS = [
-    {"id": "ring", "name": "Monarch's Ring", "icon": "💍", "rarity": "LEGENDARY", "bonus": "+2 All Stats"},
-    {"id": "key", "name": "Cartenon Key", "icon": "🔑", "rarity": "EPIC", "bonus": "Unknown Power"},
-    {"id": "elixir", "name": "Elixir of Life", "icon": "🧪", "rarity": "RARE", "bonus": "+10 VIT"},
-    {"id": "essence", "name": "Magic Essence", "icon": "💎", "rarity": "RARE", "bonus": "+10 INT"},
-    {"id": "scroll", "name": "Recovery Scroll", "icon": "📜", "rarity": "UNCOMMON", "bonus": "Reset Fatigue"},
+    {"id": "ring", "name": "Monarch's Ring", "icon": "ring", "rarity": "LEGENDARY", "bonus": "+2 All Stats"},
+    {"id": "key", "name": "Cartenon Key", "icon": "key", "rarity": "EPIC", "bonus": "Unknown Power"},
+    {"id": "elixir", "name": "Elixir of Life", "icon": "potion", "rarity": "RARE", "bonus": "+10 VIT"},
+    {"id": "essence", "name": "Magic Essence", "icon": "crystal", "rarity": "RARE", "bonus": "+10 INT"},
+    {"id": "scroll", "name": "Recovery Scroll", "icon": "scroll", "rarity": "UNCOMMON", "bonus": "Reset Fatigue"},
 ]
+
+TITLES = {
+    "weakest": {"id": "weakest", "name": "The Weakest Hunter", "desc": "Began the journey.", "rarity": "COMMON"},
+    "demon_slayer": {"id": "demon_slayer", "name": "Demon Slayer", "desc": "Reached Level 25.", "rarity": "UNCOMMON"},
+    "tenacious": {"id": "tenacious", "name": "Tenacious", "desc": "Reached a 30-day streak.", "rarity": "RARE"},
+    "shadow_monarch": {"id": "shadow_monarch", "name": "Shadow Monarch", "desc": "Reached Level 50.", "rarity": "EPIC"},
+    "national_level": {"id": "national_level", "name": "National-Level", "desc": "Reached Level 75.", "rarity": "LEGENDARY"}
+}
 
 DEFAULT_STATS = {"STR": 5, "INT": 20, "AGI": 5, "VIT": 10, "WIL": 10}
 XP_PER_DAILY = 10
@@ -191,13 +199,13 @@ STREAK_BONUS_XP = 25
 POINTS_PER_LEVEL = 5
 
 SHADOW_MILESTONES = {
-    10: {"id": "igris", "name": "IGRIS THE RED", "icon": "⚔️"},
-    20: {"id": "tank", "name": "TANK", "icon": "🐻"},
-    30: {"id": "iron", "name": "IRON", "icon": "🛡️"},
-    40: {"id": "kaisel", "name": "KAISEL", "icon": "🐉"},
-    50: {"id": "beru", "name": "BERU", "icon": "🐜"},
-    75: {"id": "greed", "name": "GREED", "icon": "🌑"},
-    90: {"id": "bellion", "name": "BELLION", "icon": "👑"},
+    10: {"id": "igris", "name": "IGRIS THE RED", "icon": "knight"},
+    20: {"id": "tank", "name": "TANK", "icon": "beast"},
+    30: {"id": "iron", "name": "IRON", "icon": "shield"},
+    40: {"id": "kaisel", "name": "KAISEL", "icon": "dragon"},
+    50: {"id": "beru", "name": "BERU", "icon": "ant"},
+    75: {"id": "greed", "name": "GREED", "icon": "mage"},
+    90: {"id": "bellion", "name": "BELLION", "icon": "king"},
 }
 
 def _get_default_profile(username):
@@ -217,6 +225,10 @@ def _get_default_profile(username):
         "inventory": [],
         "last_completion": None,
         "special_quest": None, # { id, accepted, completed_today }
+        "last_red_gate": None,
+        "red_gate_active": False,
+        "unlocked_titles": ["weakest"],
+        "active_title": "weakest"
     }
 
 def _rank_for_level(level):
@@ -329,6 +341,62 @@ def get_status():
                 "daily_completed_streak": 0,
                 "xp": user_doc["xp"]
             }})
+
+    # Title Mechanics & Red Gate
+    needs_update = False
+    
+    # 1. Passive Title Check
+    if "unlocked_titles" not in user_doc:
+        user_doc["unlocked_titles"] = ["weakest"]
+        needs_update = True
+    if "active_title" not in user_doc:
+        user_doc["active_title"] = "weakest"
+        needs_update = True
+        
+    ulist = set(user_doc["unlocked_titles"])
+    lvl = user_doc.get("level", 1)
+    strk = user_doc.get("daily_completed_streak", 0)
+    
+    if lvl >= 25 and "demon_slayer" not in ulist:
+        ulist.add("demon_slayer")
+        needs_update = True
+    if lvl >= 50 and "shadow_monarch" not in ulist:
+        ulist.add("shadow_monarch")
+        needs_update = True
+    if lvl >= 75 and "national_level" not in ulist:
+        ulist.add("national_level")
+        needs_update = True
+    if strk >= 30 and "tenacious" not in ulist:
+        ulist.add("tenacious")
+        needs_update = True
+        
+    if needs_update:
+        user_doc["unlocked_titles"] = list(ulist)
+        # Pass update flag, but we'll do one bulk update below
+        
+    # 2. Daily Red Gate Trigger (Weekly)
+    if not user_doc.get("red_gate_active"):
+        if not user_doc.get("last_red_gate") and strk >= 7:
+            # First red gate unlocks on day 7
+            user_doc["red_gate_active"] = True
+            needs_update = True
+        elif user_doc.get("last_red_gate"):
+            last_rg = datetime.fromisoformat(user_doc["last_red_gate"].replace("Z", ""))
+            if (datetime.utcnow() - last_rg).total_seconds() > (7 * 24 * 3600):
+                user_doc["red_gate_active"] = True
+                needs_update = True
+                
+    if needs_update:
+        users_collection.update_one({"username": current_user.id}, {"$set": {
+            "unlocked_titles": user_doc["unlocked_titles"],
+            "active_title": user_doc["active_title"],
+            "red_gate_active": user_doc["red_gate_active"]
+        }})
+
+    # Attach rich title info
+    user_doc["resolved_titles"] = [TITLES.get(t) for t in user_doc["unlocked_titles"] if t in TITLES]
+    active_t = TITLES.get(user_doc.get("active_title", "weakest"))
+    user_doc["active_title_display"] = active_t["name"] if active_t else "The Weakest Hunter"
 
     # Attach phase info
     day = user_doc.get("daily_completed_streak", 0) + 1  # next day to complete
@@ -475,6 +543,49 @@ def complete_special():
         }})
         return jsonify({"success": True, "item": item})
     return jsonify({"success": False, "error": "No active special quest"}), 400
+
+@app.route("/api/change-title", methods=["POST"])
+@login_required
+def change_title():
+    data = request.get_json()
+    new_title = data.get("title_id")
+    user_doc = users_collection.find_one({"username": current_user.id})
+    if new_title in user_doc.get("unlocked_titles", []):
+        users_collection.update_one({"username": current_user.id}, {"$set": {"active_title": new_title}})
+        return jsonify({"success": True})
+    return jsonify({"success": False, "error": "Title not unlocked"}), 400
+
+@app.route("/api/complete-red-gate", methods=["POST"])
+@login_required
+def complete_red_gate():
+    user_doc = users_collection.find_one({"username": current_user.id})
+    if not user_doc.get("red_gate_active"):
+        return jsonify({"success": False, "error": "No Red Gate active."}), 400
+        
+    # Massive Rewards
+    user_doc["xp"] = user_doc.get("xp", 0) + 200
+    user_doc["last_red_gate"] = datetime.utcnow().isoformat() + "Z"
+    user_doc["red_gate_active"] = False
+    
+    # Rare Item Reward
+    rare_items = [i for i in SPECIAL_ITEMS if i["rarity"] in ("EPIC", "LEGENDARY")]
+    if not rare_items: 
+        rare_items = SPECIAL_ITEMS
+    item = random.choice(rare_items).copy()
+    item["earned_at"] = datetime.utcnow().isoformat() + "Z"
+    user_doc.setdefault("inventory", []).append(item)
+    
+    # Process level up
+    user_doc = _process_level_up(user_doc)
+    
+    users_collection.update_one({"username": current_user.id}, {"$set": user_doc})
+    return jsonify({
+        "success": True, 
+        "message": "RED GATE CLEARED!",
+        "item": item,
+        "level": user_doc["level"],
+        "rank": user_doc["rank"]
+    })
 
 @app.route("/leaderboard")
 def leaderboard_page():

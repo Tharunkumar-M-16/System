@@ -1197,3 +1197,165 @@ html, body {
   font-style: italic;
 }
 
+/* ── The Monarch's Evolution (Phase 6 Additions) ── */
+
+/* Glitch Effect */
+.sl-glitch {
+  position: relative;
+}
+.sl-glitch::before, .sl-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  pointer-events: none;
+}
+.sl-glitch::before {
+  left: 2px;
+  text-shadow: -2px 0 rgba(255, 0, 193, 0.7);
+  clip: rect(44px, 450px, 56px, 0);
+  animation: sl-glitch-anim 5s infinite linear alternate-reverse;
+}
+.sl-glitch::after {
+  left: -2px;
+  text-shadow: -2px 0 rgba(0, 255, 249, 0.7);
+  clip: rect(44px, 450px, 56px, 0);
+  animation: sl-glitch-anim2 5s infinite linear alternate-reverse;
+}
+
+@keyframes sl-glitch-anim {
+  0% { clip: rect(6px, 9999px, 81px, 0); }
+  10% { clip: rect(25px, 9999px, 66px, 0); }
+  20% { clip: rect(98px, 9999px, 14px, 0); }
+  30% { clip: rect(54px, 9999px, 1px, 0); }
+  40% { clip: rect(32px, 9999px, 50px, 0); }
+  50% { clip: rect(88px, 9999px, 68px, 0); }
+  60% { clip: rect(4px, 9999px, 32px, 0); }
+  70% { clip: rect(19px, 9999px, 80px, 0); }
+  80% { clip: rect(22px, 9999px, 23px, 0); }
+  90% { clip: rect(35px, 9999px, 52px, 0); }
+  100% { clip: rect(62px, 9999px, 78px, 0); }
+}
+@keyframes sl-glitch-anim2 {
+  0% { clip: rect(22px, 9999px, 38px, 0); }
+  10% { clip: rect(96px, 9999px, 11px, 0); }
+  20% { clip: rect(14px, 9999px, 89px, 0); }
+  30% { clip: rect(8px, 9999px, 53px, 0); }
+  40% { clip: rect(3px, 9999px, 30px, 0); }
+  50% { clip: rect(27px, 9999px, 12px, 0); }
+  60% { clip: rect(51px, 9999px, 33px, 0); }
+  70% { clip: rect(95px, 9999px, 24px, 0); }
+  80% { clip: rect(13px, 9999px, 58px, 0); }
+  90% { clip: rect(88px, 9999px, 6px, 0); }
+  100% { clip: rect(38px, 9999px, 72px, 0); }
+}
+
+/* Titles */
+.sl-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sl-title-badge {
+  font-size: 10px;
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  padding: 3px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: all 0.2s;
+  background: rgba(167, 139, 250, 0.1);
+  letter-spacing: 0.1em;
+}
+.sl-title-badge:hover {
+  background: rgba(167, 139, 250, 0.3);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+}
+.sl-title-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 5px;
+  margin-bottom: 20px;
+}
+.sl-title-list::-webkit-scrollbar { width: 4px; }
+.sl-title-list::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+.sl-title-option {
+  padding: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sl-title-option:hover {
+  border-color: #60a5fa;
+  background: rgba(59, 130, 246, 0.1);
+}
+.sl-title-option.active {
+  border-color: #38bdf8;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+  border-left: 4px solid #38bdf8;
+}
+.sl-title-option h4 { margin: 0 0 4px 0; color: #e2e8f0; font-size: 14px; }
+.sl-title-option p { margin: 0; color: #94a3b8; font-size: 11px; }
+
+/* Hunter ID Card */
+.sl-id-overlay { background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+.sl-id-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  perspective: 1000px;
+  width: 100%;
+}
+.sl-id-card {
+  width: 100%;
+  max-width: 350px;
+  background: linear-gradient(145deg, #0f172a, #020617);
+  border: 1px solid #38bdf8;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.15), inset 0 0 20px rgba(56, 189, 248, 0.05);
+  transform: rotateX(5deg) rotateY(-5deg);
+  transition: transform 0.3s;
+}
+.sl-id-card:hover { transform: rotateX(0) rotateY(0); }
+.sl-id-header {
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+  padding-bottom: 16px; margin-bottom: 24px;
+}
+.sl-id-logo { color: #38bdf8; display: flex; align-items: center; }
+.sl-id-title { color: #38bdf8; font-size: 16px; font-weight: 800; letter-spacing: 0.15em; }
+.sl-id-body { display: flex; gap: 20px; margin-bottom: 24px; }
+.sl-id-photo-placeholder {
+  width: 90px; height: 120px;
+  background: rgba(56, 189, 248, 0.05);
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(56, 189, 248, 0.5);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.sl-id-details { flex: 1; display: flex; flex-direction: column; gap: 10px; justify-content: flex-end; }
+.sl-id-row { display: flex; flex-direction: column; gap: 2px; }
+.sl-id-label { font-size: 9px; color: #64748b; letter-spacing: 0.1em; }
+.sl-id-val { font-size: 14px; color: #e2e8f0; font-weight: 700; }
+.sl-id-footer {
+  border-top: 1px solid rgba(56, 189, 248, 0.3);
+  padding-top: 16px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+.sl-id-barcode { color: #38bdf8; opacity: 0.7; }
+.sl-id-issuance { font-size: 8px; color: #64748b; letter-spacing: 0.1em; text-align: right; }
+
+.sl-badge-id { border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; background: rgba(56, 189, 248, 0.1); cursor: pointer; display: flex; align-items: center; gap: 4px; padding-left: 4px;}
+.sl-badge-id svg { width: 12px; height: 12px; margin-right: 2px; }
+

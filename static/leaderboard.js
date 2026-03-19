@@ -73,13 +73,13 @@ function renderLeaderboard(leaderboardData) {
         
         if (index === 0) {
             rankClass = "sl-lb-gold";
-            rankIcon = "👑 ";
+            rankIcon = "[ 1ST ] ";
         } else if (index === 1) {
             rankClass = "sl-lb-silver";
-            rankIcon = "🥈 ";
+            rankIcon = "[ 2ND ] ";
         } else if (index === 2) {
             rankClass = "sl-lb-bronze";
-            rankIcon = "🥉 ";
+            rankIcon = "[ 3RD ] ";
         }
 
         return `
