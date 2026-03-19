@@ -5,7 +5,6 @@ let state = {
     checked: [],
     claiming: false,
     rewardData: null,
-    bgmEnabled: false,
     bgmPlayer: null,
     authMode: 'login',
     loggedIn: false
@@ -19,8 +18,24 @@ const SFX_URLS = {
     'click': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' // Subtle click
 };
 
-// Use a darker, synth-wave theme for BGM
-const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'; 
+// Dark Aria / System Theme Placeholder
+const BGM_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'; 
+
+function initBGM() {
+    if (!state.bgmPlayer) {
+        state.bgmPlayer = new Audio(BGM_URL);
+        state.bgmPlayer.loop = true;
+        state.bgmPlayer.volume = 0.15;
+    }
+}
+
+// Global click listener to unlock audio (browser requirement)
+document.addEventListener('click', () => {
+    initBGM();
+    if (state.bgmPlayer.paused) {
+        state.bgmPlayer.play().catch(e => console.log("BGM check: ", e));
+    }
+}, { once: true });
 
 
 async function init() {
@@ -179,23 +194,6 @@ function playSFX(type) {
     audio.play().catch(e => console.log("Audio play blocked: ", e));
 }
 
-function toggleBGM() {
-    if (!state.bgmPlayer) {
-        state.bgmPlayer = new Audio(BGM_URL);
-        state.bgmPlayer.loop = true;
-        state.bgmPlayer.volume = 0.2;
-    }
-
-    if (state.bgmEnabled) {
-        state.bgmPlayer.pause();
-        state.bgmEnabled = false;
-    } else {
-        state.bgmPlayer.play().catch(e => console.log("BGM play blocked: ", e));
-        state.bgmEnabled = true;
-    }
-    render();
-}
-
 function render() {
     const authRoot = document.getElementById('auth-root');
     const hunterContainer = document.getElementById('hunter-container');
@@ -274,9 +272,6 @@ function renderDashboard(container) {
         <section class="sl-card sl-profile-card">
           <div class="sl-top-nav">
             <div class="sl-nav-row">
-                <div class="sl-music-toggle ${state.bgmEnabled ? 'sl-music-on' : ''}" onclick="toggleBGM()">
-                    ${state.bgmEnabled ? '🔊 MUSIC ON' : '🔈 MUSIC OFF'}
-                </div>
                 <div class="sl-logout-btn" onclick="logout()">LOGOUT</div>
             </div>
             <div class="sl-nav-btn" onclick="window.location.href='/leaderboard'">⚔ LEADERBOARD</div>
