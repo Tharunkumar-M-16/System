@@ -172,6 +172,17 @@ DEFAULT_STATS = {"STR": 5, "INT": 20, "AGI": 5, "VIT": 10, "WIL": 10}
 XP_PER_DAILY = 10
 STREAK_BONUS_EVERY = 7
 STREAK_BONUS_XP = 25
+POINTS_PER_LEVEL = 5
+
+SHADOW_MILESTONES = {
+    10: {"id": "igris", "name": "IGRIS THE RED", "icon": "⚔️"},
+    20: {"id": "tank", "name": "TANK", "icon": "🐻"},
+    30: {"id": "iron", "name": "IRON", "icon": "🛡️"},
+    40: {"id": "kaisel", "name": "KAISEL", "icon": "🐉"},
+    50: {"id": "beru", "name": "BERU", "icon": "🐜"},
+    75: {"id": "greed", "name": "GREED", "icon": "🌑"},
+    90: {"id": "bellion", "name": "BELLION", "icon": "👑"},
+}
 
 def _get_default_profile(username):
     return {
@@ -182,9 +193,11 @@ def _get_default_profile(username):
         "xp": 0,
         "xp_to_next": 100,
         "stats": DEFAULT_STATS.copy(),
+        "stat_points": 0,
         "daily_completed_streak": 0,
         "quest_history": [],
         "abilities_unlocked": [],
+        "shadow_army": [],
     }
 
 def _rank_for_level(level):
@@ -213,8 +226,16 @@ def _process_level_up(data):
         data["xp"] -= data["xp_to_next"]
         data["level"] += 1
         data["xp_to_next"] = int(data["xp_to_next"] * 1.10)
-        data["stats"] = _apply_stat_gains(data["stats"])
+        # Award stat points instead of random gains
+        data["stat_points"] = data.get("stat_points", 0) + POINTS_PER_LEVEL
         data["abilities_unlocked"] = _check_ability_unlock(data["level"], data.get("abilities_unlocked", []))
+        
+        # Shadow Army Unlock
+        if data["level"] in SHADOW_MILESTONES:
+            shadow = SHADOW_MILESTONES[data["level"]]
+            if shadow not in data.get("shadow_army", []):
+                data.setdefault("shadow_army", []).append(shadow)
+
     data["rank"] = _rank_for_level(data["level"])
     return data
 
@@ -353,6 +374,24 @@ def reset_profile():
     new_profile = _get_default_profile(current_user.id)
     users_collection.update_one({"username": current_user.id}, {"$set": new_profile})
     return jsonify({"success": True, "message": "Profile reset to defaults."})
+
+@app.route("/api/assign-stats", methods=["POST"])
+@login_required
+def assign_stats():
+    data = request.get_json()
+    stat_key = data.get("stat")
+    if stat_key not in DEFAULT_STATS:
+        return jsonify({"success": False, "error": "Invalid stat"}), 400
+    
+    user_doc = users_collection.find_one({"username": current_user.id})
+    if user_doc.get("stat_points", 0) <= 0:
+        return jsonify({"success": False, "error": "No stat points available"}), 400
+    
+    user_doc["stats"][stat_key] += 1
+    user_doc["stat_points"] -= 1
+    
+    users_collection.update_one({"username": current_user.id}, {"$set": user_doc})
+    return jsonify({"success": True, "stats": user_doc["stats"], "stat_points": user_doc["stat_points"]})
 
 @app.route("/leaderboard")
 def leaderboard_page():

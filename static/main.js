@@ -129,6 +129,36 @@ async function claimRewards() {
     }
 }
 
+async function assignStat(stat) {
+    try {
+        const res = await fetch(`${API_BASE}/api/assign-stats`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ stat })
+        });
+        const data = await res.json();
+        if (data.success) {
+            state.profile.stats = data.stats;
+            state.profile.stat_points = data.stat_points;
+            playSFX('stat_up');
+            render();
+        }
+    } catch (err) {
+        console.error("Failed to assign stat:", err);
+    }
+}
+
+function playSFX(type) {
+    // Simple console-based feedback for now, can be replaced with actual Audio() calls
+    const colors = {
+        'stat_up': '#06b6d4',
+        'level_up': '#facc15',
+        'quest_complete': '#10b981',
+        'error': '#ef4444'
+    };
+    console.log(`%c[SYSTEM] ${type.toUpperCase()} EFFECT TRIGGERED`, `color: ${colors[type] || 'white'}; font-weight: bold;`);
+}
+
 function render() {
     const authRoot = document.getElementById('auth-root');
     const hunterContainer = document.getElementById('hunter-container');
@@ -192,6 +222,16 @@ function renderDashboard(container) {
         { key: "WIL", label: "WILLPOWER", value: p.stats.WIL, icon: "🔥" },
     ];
 
+    const shadowArmy = p.shadow_army || [];
+    const points = p.stat_points || 0;
+    
+    // Generate 100-day history grid
+    const historyGrid = Array.from({ length: 100 }, (_, i) => {
+        const day = i + 1;
+        const completed = p.daily_completed_streak >= day;
+        return `<div class="sl-history-square ${completed ? 'sl-history-done' : ''}" title="Day ${day}"></div>`;
+    }).join("");
+
     container.innerHTML = `
         <!-- ── Profile Card ── -->
         <section class="sl-card sl-profile-card">
@@ -246,6 +286,11 @@ function renderDashboard(container) {
               <div class="sl-xp-fill" style="width: ${progressPct}%; background: linear-gradient(90deg, #06b6d4, #8b5cf6);"></div>
             </div>
           </div>
+
+          <!-- History Grid -->
+          <div class="sl-history-grid">
+            ${historyGrid}
+          </div>
         </section>
 
         <!-- ── Phase Info Card ── -->
@@ -272,6 +317,11 @@ function renderDashboard(container) {
             <span class="sl-section-line"></span>
           </h2>
           <div class="sl-stats-grid">
+            ${points > 0 ? `
+              <div class="sl-points-alert">
+                 <span class="sl-points-glow">✦ ${points} STATUS POINTS AVAILABLE</span>
+              </div>
+            ` : ''}
             ${uiStats.map(s => `
               <div class="sl-stat-item">
                 <span class="sl-stat-icon">${s.icon}</span>
@@ -279,12 +329,34 @@ function renderDashboard(container) {
                   <span class="sl-stat-key">${s.key}</span>
                   <span class="sl-stat-label">${s.label}</span>
                 </div>
-                <span class="sl-stat-value">${s.value} / 100</span>
+                <div class="sl-stat-value-container">
+                    <span class="sl-stat-value">${s.value} / 100</span>
+                    ${points > 0 ? `<button class="sl-stat-add-btn" onclick="assignStat('${s.key}')">+</button>` : ''}
+                </div>
                 <div class="sl-stat-bar-track">
                   <div class="sl-stat-bar-fill" style="width: ${s.value}%"></div>
                 </div>
               </div>
             `).join('')}
+          </div>
+        </section>
+
+        <!-- ── Shadow Army Card ── -->
+        <section class="sl-card sl-shadow-card">
+          <h2 class="sl-section-title">
+            <span class="sl-section-line"></span>
+            THE SHADOW ARMY
+            <span class="sl-section-line"></span>
+          </h2>
+          <div class="sl-shadow-grid">
+            ${shadowArmy.length > 0 ? shadowArmy.map(s => `
+              <div class="sl-shadow-item">
+                <span class="sl-shadow-icon">${s.icon}</span>
+                <span class="sl-shadow-name">${s.name}</span>
+              </div>
+            `).join('') : `
+              <div class="sl-shadow-empty">NO SHADOWS EXTRACTED YET. REACH LVL 10.</div>
+            `}
           </div>
         </section>
 
@@ -374,5 +446,6 @@ window.claimRewards = claimRewards;
 window.handleAuth = handleAuth;
 window.switchAuthMode = switchAuthMode;
 window.logout = logout;
+window.assignStat = assignStat;
 
 init();

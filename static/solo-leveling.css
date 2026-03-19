@@ -907,3 +907,124 @@ html, body {
   left: 14px;
   z-index: 10;
 }
+
+/* ── History Grid ── */
+.sl-history-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.sl-history-square {
+  width: calc(10% - 3px);
+  aspect-ratio: 1;
+  background: rgba(6, 182, 212, 0.05);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  border-radius: 1px;
+}
+
+.sl-history-done {
+  background: #06b6d4;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+  border-color: #06b6d4;
+}
+
+/* ── Stat Allocation ── */
+.sl-points-alert {
+  margin-bottom: 12px;
+  text-align: center;
+  padding: 8px;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 4px;
+}
+
+.sl-points-glow {
+  font-size: 10px;
+  font-weight: 800;
+  color: #06b6d4;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+}
+
+.sl-stat-value-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sl-stat-add-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  border: 1px solid #06b6d4;
+  background: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.sl-stat-add-btn:hover {
+  background: #06b6d4;
+  color: #030712;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+/* ── Shadow Army ── */
+.sl-shadow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+}
+
+.sl-shadow-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  background: rgba(6, 182, 212, 0.05);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.sl-shadow-item:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: #06b6d4;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.sl-shadow-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.4));
+}
+
+.sl-shadow-name {
+  font-size: 8px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.sl-shadow-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 9px;
+  color: #4b5563;
+  padding: 20px;
+  letter-spacing: 0.1em;
+}
+
