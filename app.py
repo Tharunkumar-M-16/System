@@ -52,34 +52,34 @@ EXERCISE_PHASES = {
     1: {
         "title": "The Re-Awakening",
         "days": "Days 1–30",
-        "focus": "Weight loss (hips), building the foundation for push-ups and pull-ups",
+        "focus": "Foundation building, fat loss, beginner bodyweight strength",
         "quests": [
-            {"id": 1, "label": "Incline Push-ups", "sub": "4 sets to failure − 2 reps"},
-            {"id": 2, "label": "Incline Rows + Dead Hang", "sub": "4 × 10 rows + 30s hang"},
-            {"id": 3, "label": "Leg Circuit", "sub": "3 × 20 Squats + 15 Lunges/leg"},
-            {"id": 4, "label": "Treadmill Run: 2 km", "sub": "At 8 km/h · No stopping"},
+            {"id": 1, "label": "Push-ups (Knee or Standard)", "sub": "3 × 15 reps"},
+            {"id": 2, "label": "Bodyweight Squats", "sub": "3 × 20 reps"},
+            {"id": 3, "label": "Plank + Crunches", "sub": "3 × 30s Plank + 15 Crunches"},
+            {"id": 4, "label": "Run: 2 km", "sub": "Steady pace · No stopping"},
         ],
     },
     2: {
         "title": "The Hunter's Growth",
         "days": "Days 31–70",
-        "focus": "Muscle hypertrophy & stamina to shred hip fat",
+        "focus": "Endurance, muscle growth, core strength",
         "quests": [
-            {"id": 1, "label": "Floor Push-ups", "sub": "4 sets · Max reps"},
-            {"id": 2, "label": "Negative Pull-ups", "sub": "4 sets · 5s slow lower"},
-            {"id": 3, "label": "Core Circuit", "sub": "3 × 1-min Plank + 20 Leg Raises"},
-            {"id": 4, "label": "Treadmill Run: 3.5 km", "sub": "At 9 km/h"},
+            {"id": 1, "label": "Push-up Variations (Wide + Diamond)", "sub": "4 × 15 each"},
+            {"id": 2, "label": "Lunges + Jump Squats", "sub": "4 × 15 Lunges/leg + 15 Jump Squats"},
+            {"id": 3, "label": "Core Circuit", "sub": "3 × 20 Mountain Climbers + 20 Leg Raises + 45s Plank"},
+            {"id": 4, "label": "Run: 3.5 km", "sub": "Moderate pace"},
         ],
     },
     3: {
         "title": "Limit Break",
         "days": "Days 71–100",
-        "focus": "Definition, explosive power, peak cardiovascular health",
+        "focus": "Explosive power, peak endurance, definition",
         "quests": [
-            {"id": 1, "label": "Diamond + Pike Push-ups", "sub": "4 sets each · Definition & shoulders"},
-            {"id": 2, "label": "Pull-ups", "sub": "4 sets · Aim 5+ reps/set"},
-            {"id": 3, "label": "Explosive Legs", "sub": "3 × 15 Jump Squats + 20 Bulgarian Splits"},
-            {"id": 4, "label": "Treadmill 5 km / HIIT", "sub": "Sprint 12 km/h · 1min on/1min off · 20 min"},
+            {"id": 1, "label": "Explosive Push-ups + Pike Push-ups", "sub": "4 × 15 each"},
+            {"id": 2, "label": "Pistol Squat Progressions + Burpees", "sub": "4 × 15 each"},
+            {"id": 3, "label": "Core Destroyer", "sub": "3 × 20 V-ups + 20 Bicycle Crunches + 20 Flutter Kicks"},
+            {"id": 4, "label": "Run: 5 km / HIIT Sprints", "sub": "Sprint intervals · 20 min"},
         ],
     },
 }
@@ -96,11 +96,11 @@ RANK_PROGRESSION = [
 
 RANK_GATES = {
     17: {"from": "E-Rank", "to": "D-Rank", "req": "Complete 16 consecutive daily quests"},
-    34: {"from": "D-Rank", "to": "C-Rank", "req": "Perform 10 clean floor push-ups"},
-    51: {"from": "C-Rank", "to": "B-Rank", "req": "Hold a 60-second plank + 30 push-ups"},
-    68: {"from": "B-Rank", "to": "A-Rank", "req": "Perform 1 strict dead-hang pull-up"},
-    85: {"from": "A-Rank", "to": "S-Rank", "req": "5 pull-ups + 50 push-ups in one session"},
-    100: {"from": "S-Rank", "to": "MONARCH", "req": "FINAL BOSS: 100 Push-ups, 100 Squats, 10 km Run"},
+    34: {"from": "D-Rank", "to": "C-Rank", "req": "20 clean push-ups + 1-min plank"},
+    51: {"from": "C-Rank", "to": "B-Rank", "req": "30 push-ups + 40 squats non-stop"},
+    68: {"from": "B-Rank", "to": "A-Rank", "req": "50 push-ups + 20 burpees in one session"},
+    85: {"from": "A-Rank", "to": "S-Rank", "req": "75 push-ups + 50 squats + 30 burpees"},
+    100: {"from": "S-Rank", "to": "MONARCH", "req": "FINAL BOSS: 100 Push-ups, 100 Squats, 50 Burpees, 10 km Run"},
 }
 
 def _rank_for_day(day):
@@ -163,8 +163,8 @@ ABILITY_UNLOCKS = {
     10: "Sprint Burst — Unlock sprinting intervals for bonus AGI",
     15: "Iron Skin — Unlock plank holds for bonus VIT",
     20: "Shadow Step — Unlock jump squats for bonus AGI",
-    25: "Ruler's Authority — Unlock weighted exercises for all stats",
-    30: "Arise — Unlock shadow-army partner workouts",
+    25: "Ruler's Authority — Unlock advanced bodyweight combos for all stats",
+    30: "Arise — Unlock shadow-army endurance circuits",
     50: "Domain Expansion — Unlock full-body advanced routines",
     75: "Kamish's Wrath — Unlock extreme endurance challenges",
 }
