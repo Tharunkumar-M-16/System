@@ -82,6 +82,7 @@ async function handleAuth(e) {
                 render();
             }
         } else {
+            playSFX('error');
             alert(data.error || "Authentication failed");
         }
     } catch (err) {
