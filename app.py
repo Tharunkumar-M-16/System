@@ -10,6 +10,7 @@ from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import bcrypt
+from werkzeug.security import check_password_hash
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
@@ -295,9 +296,31 @@ def login():
     username = data.get("username")
     password = data.get("password")
     user_doc = users_collection.find_one({"username": username})
-    if user_doc and bcrypt.checkpw(password.encode("utf-8"), user_doc["password"]):
-        login_user(User(username, username))
-        return jsonify({"success": True, "message": "Logged in", "username": username})
+    
+    if user_doc:
+        db_pw = user_doc.get("password", "")
+        valid = False
+        
+        if isinstance(db_pw, bytes):
+            try:
+                valid = bcrypt.checkpw(password.encode("utf-8"), db_pw)
+            except Exception:
+                pass
+        elif isinstance(db_pw, str):
+            if db_pw.startswith("pbkdf2:") or db_pw.startswith("scrypt:"):
+                valid = check_password_hash(db_pw, password)
+            else:
+                try:
+                    valid = bcrypt.checkpw(password.encode("utf-8"), db_pw.encode("utf-8"))
+                except Exception:
+                    pass
+        else:
+            valid = False
+            
+        if valid:
+            login_user(User(username, username))
+            return jsonify({"success": True, "message": "Logged in", "username": username})
+            
     return jsonify({"success": False, "error": "Invalid credentials"}), 401
 
 @app.route("/api/logout", methods=["POST"])

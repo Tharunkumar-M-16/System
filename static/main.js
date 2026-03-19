@@ -385,7 +385,7 @@ function renderDashboard(container) {
             </div>
             <div class="sl-profile-info">
               <p class="sl-subtitle">PLAYER STATUS · DAY ${p.daily_completed_streak || 0} / 100</p>
-              <h1 class="sl-name sl-glitch" data-text="${(p.hunter_name || 'HUNTER').toUpperCase()}">
+              <h1 class="sl-name">
                   <span class="sl-title-badge" onclick="showTitleModal()">${(p.active_title_display || 'THE WEAKEST HUNTER').toUpperCase()}</span>
                   ${(p.hunter_name || 'HUNTER').toUpperCase()}
               </h1>
